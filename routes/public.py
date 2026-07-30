@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, flash, redirect, url_for, session, jsonify
 from datetime import datetime
 from services.sheets_service import (
     get_karyawan_by_nip,
@@ -6,6 +6,7 @@ from services.sheets_service import (
     append_row,
 )
 from services.kuota_service import boleh_ajukan, sisa_kuota, get_tahun_sekarang
+from config.settings import SHEET_CUTI
 from services.security import validate_csrf, rate_limit, get_real_ip, safe_error_message
 
 public_bp = Blueprint("public", __name__)
@@ -101,9 +102,11 @@ def form_cuti():
         }
 
         try:
-            append_row("CUTI 2026", data)
+            append_row(SHEET_CUTI, data)
             flash("Pengajuan berhasil dikirim! Simpan NIP Anda untuk cek status.", "success")
-            return redirect(url_for("public.form_cuti"))
+            # Store NIP in session and redirect to cek-status
+            session['pending_nip'] = nip
+            return redirect(url_for("public.cek_status"))
         except Exception as e:
             flash(safe_error_message(e, "mengirim pengajuan"), "danger")
             return render_template("form_cuti.html", form_data=request.form)
@@ -111,31 +114,42 @@ def form_cuti():
     return render_template("form_cuti.html", form_data={})
 
 
-@public_bp.route("/api/karyawan/<nip>")
-@rate_limit(max_requests=30, window_seconds=60)  # 30 lookup per menit per IP
-def api_karyawan(nip):
-    # Only allow numeric NIP
+@public_bp.route("/api/karyawan/validate/<nip>")
+@rate_limit(max_requests=30, window_seconds=60)
+def api_validate_nip(nip):
+    """Validate NIP exists. Returns only validation result, no personal data."""
     nip_clean = nip.strip()
     if not nip_clean.isdigit() or len(nip_clean) > 20:
-        return jsonify({"found": False}), 400
+        return jsonify({"valid": False, "message": "Format NIP tidak valid."}), 400
     karyawan = get_karyawan_by_nip(nip_clean)
     if not karyawan:
-        return jsonify({"found": False}), 404
-    return jsonify(
-        {
-            "found": True,
-            "nama": karyawan.get("NAMA", ""),
-            "jabatan": karyawan.get("JABATAN", ""),
-            "seksi": karyawan.get("SEKSI", ""),
-            "shif": karyawan.get("SHIF", ""),
-            "kabid_kasi": karyawan.get("KABID_KASI", ""),
-        }
-    )
+        return jsonify({"valid": False, "message": "NIP tidak terdaftar."}), 404
+    return jsonify({"valid": True, "message": "NIP terdaftar."})
+
 
 
 @public_bp.route("/cek-status", methods=["GET", "POST"])
-@rate_limit(max_requests=20, window_seconds=60)  # 20 per menit per IP
+@rate_limit(max_requests=20, window_seconds=60)
 def cek_status():
+    # Auto-show if redirected from form submission
+    if request.method == "GET" and "pending_nip" in session:
+        nip = session.pop("pending_nip")
+        session.pop("pending_tgl_lahir", None)
+        karyawan = get_karyawan_by_nip(nip)
+        if karyawan:
+            pengajuan = get_pengajuan_by_nip(nip)
+            tahun = get_tahun_sekarang()
+            sisa = sisa_kuota(nip, tahun)
+            return render_template(
+                "cek_status.html",
+                pengajuan=pengajuan,
+                nama=karyawan.get("NAMA", ""),
+                nip=nip,
+                sisa_kuota=sisa,
+                tahun=tahun,
+                submitted=True,
+            )
+
     if request.method == "POST":
         validate_csrf()  # CSRF check
 
@@ -172,5 +186,23 @@ def cek_status():
             tahun=tahun,
             submitted=True,
         )
+
+    # GET: check if we have a pending_nip from form submission redirect
+    pending_nip = session.pop('pending_nip', None)
+    if pending_nip:
+        karyawan = get_karyawan_by_nip(pending_nip)
+        if karyawan:
+            pengajuan = get_pengajuan_by_nip(pending_nip)
+            tahun = get_tahun_sekarang()
+            sisa = sisa_kuota(pending_nip, tahun)
+            return render_template(
+                "cek_status.html",
+                pengajuan=pengajuan,
+                nama=karyawan.get("NAMA", ""),
+                nip=pending_nip,
+                sisa_kuota=sisa,
+                tahun=tahun,
+                submitted=True,
+            )
 
     return render_template("cek_status.html", submitted=False)

@@ -65,9 +65,10 @@ def create_app():
     # Pre-warm Google Sheets connection + data cache at startup
     with app.app_context():
         try:
+            from config.settings import SHEET_CUTI, SHEET_KARYAWAN
             from services.sheets_service import get_all_records
-            get_all_records("KARYAWAN")
-            get_all_records("CUTI 2026")
+            get_all_records(SHEET_KARYAWAN)
+            get_all_records(SHEET_CUTI)
             print("Sheets cache warmed")
         except Exception as e:
             print(f"Sheets warm-up failed (will retry on first request): {e}")

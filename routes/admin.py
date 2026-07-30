@@ -1,3 +1,4 @@
+from config.settings import SHEET_CUTI
 from flask import (
     Blueprint,
     render_template,
@@ -112,7 +113,7 @@ def detail(row_num):
     if row_num < 2:
         abort(404)
 
-    sheet = get_sheet("CUTI 2026")
+    sheet = get_sheet(SHEET_CUTI)
     try:
         row = sheet.row_values(row_num)
         headers = sheet.row_values(1)
@@ -132,7 +133,7 @@ def generate_surat_route(row_num):
     if row_num < 2:
         abort(404)
 
-    sheet = get_sheet("CUTI 2026")
+    sheet = get_sheet(SHEET_CUTI)
     try:
         row = sheet.row_values(row_num)
         headers = sheet.row_values(1)
@@ -183,7 +184,7 @@ def update_status(row_num):
         return redirect(url_for("admin.detail", row_num=row_num))
 
     try:
-        update_row_status("CUTI 2026", row_num, status, no_surat if status == "Disetujui" else None)
+        update_row_status(SHEET_CUTI, row_num, status, no_surat if status == "Disetujui" else None)
         flash(f"Status berhasil diubah ke {status}.", "success")
     except Exception as e:
         flash(safe_error_message(e, "update status"), "danger")
@@ -194,7 +195,7 @@ def update_status(row_num):
 @admin_bp.route("/histori")
 @login_required
 def histori():
-    semua = get_all_records("CUTI 2026")
+    semua = get_all_records(SHEET_CUTI)
     tahun_filter = request.args.get("tahun", str(get_tahun_sekarang()))
     bulan_filter = request.args.get("bulan", "")
     seksi_filter = request.args.get("seksi", "")
@@ -239,7 +240,7 @@ def histori():
 @login_required
 def export_excel():
     dari_tahun = request.args.get("tahun", str(get_tahun_sekarang()))
-    semua = get_all_records("CUTI 2026")
+    semua = get_all_records(SHEET_CUTI)
     filtered = [r for r in semua if str(r.get("TAHUN", "")) == dari_tahun]
 
     if not filtered:

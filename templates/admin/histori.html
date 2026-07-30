@@ -3,26 +3,31 @@
 
 {% block content %}
 <div class="mb-4">
-    <h1 class="font-display text-display text-ink">Histori & Rekap</h1>
-    <p class="text-ink-muted text-[13px] mt-1">Rekapitulasi data pengajuan cuti</p>
+    <h1 class="font-display text-display text-base-content">Histori & Rekap</h1>
+    <p class="text-base-content/50 text-[13px] mt-1">Rekapitulasi data pengajuan cuti</p>
 </div>
 
-<div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
     <!-- Filter — 2-col grid on mobile, flex on desktop -->
-    <form method="GET" action="{{ url_for('admin.histori') }}" class="mb-4 pb-4 border-b border-rule">
+    <form method="GET" action="{{ url_for('admin.histori') }}" class="mb-4 pb-4 border-b border-base-300">
         <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 items-end">
             <div>
-                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Tahun</label>
+                <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Tahun</label>
                 <input type="number" name="tahun" value="{{ tahun_filter }}" min="2024" max="2030"
                        class="input input-bordered input-sm text-[13px] w-full">
             </div>
             <div>
-                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Bulan</label>
-                <input type="text" name="bulan" placeholder="Juli" value="{{ bulan_filter }}"
-                       class="input input-bordered input-sm text-[13px] w-full">
+                <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Bulan</label>
+                <select name="bulan" class="select select-bordered select-sm text-[13px] w-full">
+                    <option value="">Semua</option>
+                    {% set months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] %}
+                    {% for m in months %}
+                    <option value="{{ m }}" {{ 'selected' if bulan_filter == m }}>{{ m }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div>
-                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Seksi</label>
+                <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Seksi</label>
                 <select name="seksi" class="select select-bordered select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     {% for s in semua_seksi %}
@@ -31,7 +36,7 @@
                 </select>
             </div>
             <div>
-                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Status</label>
+                <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Status</label>
                 <select name="status" class="select select-bordered select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     <option value="Menunggu ACC" {{ 'selected' if status_filter == 'Menunggu ACC' }}>Menunggu</option>
@@ -45,7 +50,7 @@
                     Filter
                 </button>
                 <a href="{{ url_for('admin.export_excel', tahun=tahun_filter) }}"
-                   class="btn btn-sm btn-ghost text-ink-muted text-[13px] whitespace-nowrap">
+                   class="btn btn-sm btn-ghost text-base-content/50 text-[13px] whitespace-nowrap">
                     Export
                 </a>
             </div>
@@ -54,21 +59,21 @@
 
     <!-- Kuota -->
     {% if karyawan_kuota %}
-    <h3 class="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2.5">Kuota Karyawan</h3>
+    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Kuota Karyawan</h3>
     <div class="table-wrap mb-4">
         <table class="table table-zebra table-sm">
             <thead>
                 <tr class="bg-paper-2">
-                    <th class="text-[11px] text-ink-muted font-semibold uppercase tracking-wide">NIP</th>
-                    <th class="text-[11px] text-ink-muted font-semibold uppercase tracking-wide">Nama</th>
-                    <th class="text-[11px] text-ink-muted font-semibold uppercase tracking-wide">Pakai</th>
-                    <th class="text-[11px] text-ink-muted font-semibold uppercase tracking-wide">Sisa</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">NIP</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Nama</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Pakai</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Sisa</th>
                 </tr>
             </thead>
             <tbody>
                 {% for nip, info in karyawan_kuota.items() %}
                 <tr>
-                    <td class="font-mono text-xs text-ink-muted">{{ nip }}</td>
+                    <td class="font-mono text-xs text-base-content/50">{{ nip }}</td>
                     <td class="font-medium text-[13px]">{{ info.nama }}</td>
                     <td class="text-[13px]">{{ info.terpakai }}</td>
                     <td>
@@ -76,7 +81,7 @@
                         {% set level = 'progress-error' if pct >= 75 else ('progress-warning' if pct >= 50 else 'progress-success') %}
                         <div class="flex items-center gap-2">
                             <progress class="progress {{ level }} w-16 h-1.5" value="{{ pct }}" max="100"></progress>
-                            <span class="text-xs text-ink-muted whitespace-nowrap">{{ info.sisa }}/12</span>
+                            <span class="text-xs text-base-content/50 whitespace-nowrap">{{ info.sisa }}/12</span>
                         </div>
                     </td>
                 </tr>
@@ -87,7 +92,7 @@
     {% endif %}
 
     <!-- Data -->
-    <h3 class="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-2.5">Data Pengajuan</h3>
+    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Data Pengajuan</h3>
     {% if pengajuan %}
     <div class="table-wrap">
         <table class="table table-zebra table-sm">
@@ -106,13 +111,13 @@
             <tbody>
                 {% for p in pengajuan %}
                 <tr>
-                    <td class="text-ink-muted text-xs">{{ loop.index }}</td>
+                    <td class="text-base-content/50 text-xs">{{ loop.index }}</td>
                     <td class="font-medium text-[13px]">{{ p.get('NAMA', '-') }}</td>
-                    <td class="font-mono text-xs text-ink-muted">{{ p.get('NIP', '-') }}</td>
+                    <td class="font-mono text-xs text-base-content/50">{{ p.get('NIP', '-') }}</td>
                     <td class="text-[13px] whitespace-nowrap">{{ p.get('HARI', '-') }}</td>
                     <td class="text-[13px]">{{ p.get('KEPERLUAN', '-') }}</td>
-                    <td class="font-mono text-xs text-ink-muted">{{ p.get('NO SURAT', '-') or '-' }}</td>
-                    <td class="text-[13px] text-ink-muted">{{ p.get('SEKSI', '-') }}</td>
+                    <td class="font-mono text-xs text-base-content/50">{{ p.get('NO SURAT', '-') or '-' }}</td>
+                    <td class="text-[13px] text-base-content/50">{{ p.get('SEKSI', '-') }}</td>
                     <td>
                         {% set status = p.get('STATUS', '').strip() %}
                         {% if status == 'Menunggu ACC' %}

@@ -3,24 +3,24 @@
 
 {% block content %}
 <div class="mb-4">
-    <h1 class="font-display text-display text-ink">Cek Status</h1>
-    <p class="text-ink-muted text-[13px] mt-1">Masukkan NIP dan Tanggal Lahir</p>
+    <h1 class="font-display text-display text-base-content">Cek Status</h1>
+    <p class="text-base-content/50 text-[13px] mt-1">Masukkan NIP dan Tanggal Lahir</p>
 </div>
 
-<div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
     <form method="POST" action="{{ url_for('public.cek_status') }}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-                <label class="block text-[13px] font-medium text-ink mb-1">NIP <span class="text-error">*</span></label>
+                <label class="block text-[13px] font-medium text-base-content mb-1">NIP <span class="text-error">*</span></label>
                 <input type="text" name="nip" placeholder="Masukkan NIP" required class="input input-bordered w-full text-sm">
             </div>
             <div>
-                <label class="block text-[13px] font-medium text-ink mb-1">Tanggal Lahir <span class="text-error">*</span></label>
+                <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Lahir <span class="text-error">*</span></label>
                 <input type="date" name="tgl_lahir" required class="input input-bordered w-full text-sm">
             </div>
             <div class="sm:flex sm:items-end">
-                <button type="submit" class="btn bg-accent hover:bg-accent-2 text-white border-none text-sm font-semibold w-full">
+                <button type="submit" class="btn bg-primary hover:opacity-90 text-primary-content border-none text-sm font-semibold w-full">
                     Cek Status
                 </button>
             </div>
@@ -28,15 +28,15 @@
     </form>
 
     {% if submitted %}
-    <div class="border-t border-rule my-4"></div>
+    <div class="border-t border-base-300 my-4"></div>
 
     <!-- Result header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
         <div>
-            <h2 class="font-display text-lg text-ink">{{ nama }}</h2>
-            <p class="text-xs text-ink-muted font-mono">{{ nip }}</p>
+            <h2 class="font-display text-lg text-base-content">{{ nama }}</h2>
+            <p class="text-xs text-base-content/50 font-mono">{{ nip }}</p>
         </div>
-        <span class="inline-flex items-center justify-center sm:justify-start gap-1.5 text-[13px] font-medium text-accent bg-accent-light px-3 py-1 rounded-full whitespace-nowrap">
+        <span class="inline-flex items-center justify-center sm:justify-start gap-1.5 text-[13px] font-medium text-primary bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
             Sisa kuota: {{ sisa_kuota }} / 12
         </span>
     </div>
@@ -57,7 +57,7 @@
                 <tr>
                     <td class="font-medium text-[13px]">{{ p.get('HARI', '-') }}</td>
                     <td class="text-[13px]">{{ p.get('KEPERLUAN', '-') }}</td>
-                    <td class="font-mono text-xs text-ink-muted">{{ p.get('NO SURAT', '-') or '-' }}</td>
+                    <td class="font-mono text-xs text-base-content/50">{{ p.get('NO SURAT', '-') or '-' }}</td>
                     <td>
                         {% set status = p.get('STATUS', '').strip() %}
                         {% if status == 'Menunggu ACC' %}

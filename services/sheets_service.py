@@ -3,6 +3,7 @@ from google.oauth2.service_account import Credentials
 import json
 import os
 import time
+from config.settings import SHEET_CUTI, SHEET_KARYAWAN
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -61,7 +62,30 @@ def _get_cached_data(sheet_name):
         return cached["data"]
 
     sheet = get_sheet(sheet_name)
-    data = sheet.get_all_records()
+    head_row = 2 if sheet_name == SHEET_KARYAWAN else 1
+    try:
+        data = sheet.get_all_records(head=head_row)
+    except Exception:
+        all_values = sheet.get_all_values()
+        if not all_values:
+            data = []
+        else:
+            raw_headers = all_values[head_row - 1]
+            seen = {}
+            headers = []
+            for h in raw_headers:
+                h = h.strip()
+                if not h: continue
+                if h in seen:
+                    seen[h] += 1
+                    headers.append(f"{h}_{seen[h]}")
+                else:
+                    seen[h] = 0
+                    headers.append(h)
+            data = []
+            for row in all_values[head_row:]:
+                row_padded = row + [""] * (len(headers) - len(row))
+                data.append(dict(zip(headers, row_padded)))
     _data_cache[sheet_name] = {"data": data, "ts": now}
     return data
 
@@ -81,20 +105,25 @@ def get_all_records(sheet_name):
 
 
 def get_karyawan_by_nip(nip):
-    records = get_all_records("KARYAWAN")
+    records = get_all_records(SHEET_KARYAWAN)
     for r in records:
-        if str(r.get("NIP", "")).strip() == str(nip).strip():
+        if str(r.get("NI PPPK PW", "")).strip() == str(nip).strip():
+            nip_str = str(nip).strip()
+            if len(nip_str) >= 8:
+                r["TGL_LAHIR"] = f"{nip_str[:4]}-{nip_str[4:6]}-{nip_str[6:8]}"
+            else:
+                r["TGL_LAHIR"] = ""
             return r
     return None
 
 
 def get_pengajuan_by_nip(nip):
-    records = get_all_records("CUTI 2026")
-    return [r for r in records if str(r.get("NIP", "")).strip() == str(nip).strip()]
+    records = get_all_records(SHEET_CUTI)
+    return [r for r in records if str(r.get("NI PPPK PW", "")).strip() == str(nip).strip()]
 
 
 def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=None):
-    records = get_all_records("CUTI 2026")
+    records = get_all_records(SHEET_CUTI)
     result = []
     for i, r in enumerate(records):
         # Row number = i + 2 (1-indexed, +1 for header)
@@ -142,7 +171,7 @@ def get_all_seksi(sheet_name="CUTI 2026"):
 
 
 def get_stats():
-    records = get_all_records("CUTI 2026")
+    records = get_all_records(SHEET_CUTI)
     menunggu = sum(1 for r in records if r.get("STATUS", "").strip() == "Menunggu ACC")
     disetujui = sum(1 for r in records if r.get("STATUS", "").strip() == "Disetujui")
     ditolak = sum(1 for r in records if r.get("STATUS", "").strip() == "Ditolak")
