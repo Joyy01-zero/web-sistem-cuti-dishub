@@ -6,6 +6,13 @@ from models import AdminUser
 
 
 def create_app():
+    # Validate SECRET_KEY before anything else
+    if not SECRET_KEY or SECRET_KEY == "change-me-in-production":
+        raise RuntimeError(
+            "SECRET_KEY belum dikonfigurasi! Set environment variable SECRET_KEY "
+            "dengan nilai random yang aman sebelum menjalankan aplikasi. "
+            "Contoh: export SECRET_KEY=$(python -c 'import secrets; print(secrets.token_hex(32))')"
+        )
     app = Flask(__name__)
     app.secret_key = SECRET_KEY
     app.permanent_session_lifetime = timedelta(minutes=SESSION_TIMEOUT_MINUTES)

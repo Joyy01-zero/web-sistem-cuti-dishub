@@ -72,10 +72,14 @@ def rate_limit(max_requests, window_seconds, key_func=None):
 # IP Address (handle reverse proxy)
 # ============================================================
 
+from config.settings import TRUSTED_PROXIES
+
+
 def get_real_ip():
-    """Get real client IP, respecting X-Forwarded-For behind reverse proxy."""
-    if request.headers.get("X-Forwarded-For"):
-        # Take first IP (original client)
+    """Get real client IP. Only trust X-Forwarded-For from known proxies."""
+    remote = request.remote_addr or "unknown"
+    if TRUSTED_PROXIES and remote in TRUSTED_PROXIES and request.headers.get("X-Forwarded-For"):
+        # Only trust X-Forwarded-For if request comes from a known proxy
         return request.headers["X-Forwarded-For"].split(",")[0].strip()
     return request.remote_addr or "unknown"
 

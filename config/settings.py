@@ -4,7 +4,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # App
-SECRET_KEY = os.environ.get("SECRET_KEY", "change-me-in-production")
+SECRET_KEY = os.environ.get("SECRET_KEY", "")
+TRUSTED_PROXIES = os.environ.get("TRUSTED_PROXIES", "").split(",") if os.environ.get("TRUSTED_PROXIES") else []
 SPREADSHEET_ID = os.environ.get("SPREADSHEET_ID", "")
 
 # Admin

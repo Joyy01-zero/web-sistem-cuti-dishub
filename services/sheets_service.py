@@ -108,6 +108,7 @@ def get_karyawan_by_nip(nip):
     records = get_all_records(SHEET_KARYAWAN)
     for r in records:
         if str(r.get("NI PPPK PW", "")).strip() == str(nip).strip():
+            r = dict(r)  # copy to avoid mutating cached data
             nip_str = str(nip).strip()
             if len(nip_str) >= 8:
                 r["TGL_LAHIR"] = f"{nip_str[:4]}-{nip_str[4:6]}-{nip_str[6:8]}"
@@ -163,6 +164,8 @@ def update_cell(sheet_name, row_num, col_name, value):
 
 def update_row_status(sheet_name, row_num, status, no_surat=None):
     update_cell(sheet_name, row_num, "STATUS", status)
+    if no_surat is not None and str(no_surat).strip():
+        update_cell(sheet_name, row_num, "NO SURAT", str(no_surat).strip())
 
 
 def get_all_seksi(sheet_name="CUTI 2026"):
