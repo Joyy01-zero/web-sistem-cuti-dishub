@@ -1,0 +1,166 @@
+/* === Sistem Cuti Dishub — Hallmark Design Tokens === */
+
+/* Base */
+body {
+    font-family: 'Geist', system-ui, -apple-system, sans-serif;
+    color: #272a33;
+    background-color: #f5f6f9;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+}
+html {
+    overflow-x: clip;
+}
+
+/* Display heading */
+.heading-display {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.15;
+    color: #272a33;
+    overflow-wrap: anywhere;
+}
+
+/* Stat card */
+.stat-card-hover {
+    transition: box-shadow 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+    .stat-card-hover:hover {
+        box-shadow: 0 4px 16px rgba(31, 58, 100, 0.07);
+    }
+}
+
+/* Table */
+.thead-accent th {
+    background-color: #1f3a64 !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+/* Badge */
+.badge {
+    font-weight: 600;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    border: none;
+    white-space: nowrap;
+}
+.badge-warning {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+.badge-success {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+}
+.badge-error {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+.badge-info {
+    background-color: #dbeafe !important;
+    color: #1e3a5f !important;
+}
+.badge-ghost {
+    background-color: #ecedf2 !important;
+    color: #5c6170 !important;
+}
+
+/* Input focus */
+.input:focus,
+.select:focus {
+    border-color: #1f3a64 !important;
+    box-shadow: 0 0 0 2px rgba(31, 58, 100, 0.08) !important;
+    outline: none;
+}
+
+/* Touch targets — min 44px on coarse pointer */
+@media (pointer: coarse) {
+    .btn, .input, .select, a[class*="px-3"] {
+        min-height: 44px;
+    }
+    .input, .select {
+        font-size: 16px; /* prevents iOS zoom */
+    }
+}
+
+/* Info field */
+.info-field {
+    background-color: #ecedf2;
+    border: 1px solid #d3d6e0;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+}
+.info-field-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #7a7f8e;
+    margin-bottom: 0.125rem;
+}
+.info-field-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #272a33;
+    overflow-wrap: anywhere;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #7a7f8e;
+}
+.empty-state-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+.empty-state-text {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Section header */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Buttons — no wrap */
+.btn {
+    white-space: nowrap;
+}
+
+/* Table responsive */
+.table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+}
+
+/* Mobile-specific */
+@media (max-width: 640px) {
+    .table-sm td, .table-sm th {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    /* Stack info fields tighter on mobile */
+    .info-field {
+        padding: 0.5rem 0.75rem;
+    }
+    /* Form inputs full width, no gap issues */
+    .input, .select {
+        width: 100%;
+    }
+}

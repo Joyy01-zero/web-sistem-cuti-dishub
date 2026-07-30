@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Detail Pengajuan{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="font-display text-display text-ink">Detail Pengajuan</h1>
+    <p class="text-ink-muted text-[13px] mt-1">Informasi lengkap pengajuan cuti</p>
+</div>
+
+<div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+    <!-- Data Grid — 1 col mobile, 2 tablet, 3 desktop -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div class="info-field">
+            <div class="info-field-label">Nama</div>
+            <div class="info-field-value font-semibold">{{ data.get('NAMA', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">NIP</div>
+            <div class="info-field-value font-mono text-[13px]">{{ data.get('NIP', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Jabatan</div>
+            <div class="info-field-value">{{ data.get('JABATAN', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Seksi</div>
+            <div class="info-field-value">{{ data.get('SEKSI', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Shif</div>
+            <div class="info-field-value">{{ data.get('SHIF', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Tanggal Cuti</div>
+            <div class="info-field-value font-semibold">{{ data.get('HARI', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Keperluan</div>
+            <div class="info-field-value">{{ data.get('KEPERLUAN', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Kabid/Kasi</div>
+            <div class="info-field-value">{{ data.get('KABID/KASI', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">No Surat</div>
+            <div class="info-field-value font-mono text-[13px]">{{ data.get('NO SURAT', '-') or '-' }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Tanggal Submit</div>
+            <div class="info-field-value">{{ data.get('TGL_SUBMIT', '-') }}</div>
+        </div>
+        <div class="info-field">
+            <div class="info-field-label">Status</div>
+            <div class="mt-0.5">
+                {% set status = data.get('STATUS', '').strip() %}
+                {% if status == 'Menunggu ACC' %}
+                <span class="badge badge-warning">Menunggu ACC</span>
+                {% elif status == 'Disetujui' %}
+                <span class="badge badge-success">Disetujui</span>
+                {% elif status == 'Ditolak' %}
+                <span class="badge badge-error">Ditolak</span>
+                {% elif status == 'Dibatalkan' %}
+                <span class="badge badge-ghost">Dibatalkan</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if data.get('STATUS', '').strip() == 'Menunggu ACC' %}
+    <div class="border-t border-rule my-4"></div>
+
+    <h3 class="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-3">Proses Pengajuan</h3>
+
+    <div class="mb-3">
+        <a href="{{ url_for('admin.generate_surat_route', row_num=row_num) }}"
+           class="btn btn-sm btn-info btn-outline text-[13px]">
+            Generate Surat
+        </a>
+    </div>
+
+    <!-- Action forms — stack on mobile -->
+    <div class="space-y-3 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-3">
+        <form method="POST" action="{{ url_for('admin.update_status', row_num=row_num) }}" class="flex flex-col sm:flex-row gap-2">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="Disetujui">
+            <div class="flex-1 sm:flex-none">
+                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Nomor Surat <span class="text-error">*</span></label>
+                <input type="text" name="no_surat" placeholder="167/PKWT/VI/2026" required
+                       class="input input-bordered input-sm text-[13px] w-full sm:w-56">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="btn btn-sm bg-success text-white border-none text-[13px] font-semibold w-full sm:w-auto"
+                        onclick="return confirm('Setujui pengajuan ini?')">
+                    Setujui
+                </button>
+            </div>
+        </form>
+
+        <form method="POST" action="{{ url_for('admin.update_status', row_num=row_num) }}" class="flex items-end">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="status" value="Ditolak">
+            <button type="submit" class="btn btn-sm btn-outline border-error text-error text-[13px] font-semibold w-full sm:w-auto"
+                    onclick="return confirm('Tolak pengajuan ini?')">
+                Tolak
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="mt-5 pt-4 border-t border-rule">
+        <a href="{{ url_for('admin.dashboard') }}" class="text-[13px] text-ink-muted hover:text-accent transition-colors">
+            &larr; Kembali ke Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

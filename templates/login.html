@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[50vh] sm:min-h-[55vh]">
+    <div class="w-full max-w-sm">
+        <div class="text-center mb-5">
+            <div class="w-11 h-11 rounded-lg bg-accent flex items-center justify-center mx-auto mb-3 text-white text-lg font-semibold">
+                D
+            </div>
+            <h1 class="font-display text-xl text-ink">Login Admin</h1>
+            <p class="text-ink-muted text-[13px] mt-0.5">Dishub Kota Bogor</p>
+        </div>
+
+        <div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+            <form method="POST" action="{{ url_for('admin.login') }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <div class="mb-3">
+                    <label class="block text-[13px] font-medium text-ink mb-1">Username</label>
+                    <input type="text" name="username" placeholder="Username" required autofocus
+                           class="input input-bordered w-full text-sm">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-[13px] font-medium text-ink mb-1">Password</label>
+                    <input type="password" name="password" placeholder="Password" required
+                           class="input input-bordered w-full text-sm">
+                </div>
+                <button type="submit" class="btn w-full bg-accent hover:bg-accent-2 text-white border-none text-sm font-semibold">
+                    Masuk
+                </button>
+            </form>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ url_for('public.form_cuti') }}" class="text-xs text-ink-muted hover:text-accent transition-colors">
+                &larr; Kembali
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

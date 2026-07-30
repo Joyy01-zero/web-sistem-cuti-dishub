@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Form Pengajuan Cuti{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="font-display text-display text-ink">Pengajuan Cuti</h1>
+    <p class="text-ink-muted text-[13px] mt-1">Isi formulir untuk mengajukan cuti</p>
+</div>
+
+<div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+    <form method="POST" action="{{ url_for('public.form_cuti') }}" id="formCuti">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        <!-- Data Pribadi -->
+        <div class="mb-5">
+            <h3 class="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-3">Data Pribadi</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">NIP <span class="text-error">*</span></label>
+                    <input type="text" id="nip" name="nip" value="{{ form_data.get('nip', '') }}"
+                           placeholder="Masukkan NIP" required autocomplete="off"
+                           class="input input-bordered w-full text-sm">
+                    <span id="nip-status" class="text-xs mt-0.5 block"></span>
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Nama Lengkap <span class="text-error">*</span></label>
+                    <input type="text" id="nama" name="nama" value="{{ form_data.get('nama', '') }}"
+                           placeholder="Nama lengkap" required class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Tanggal Lahir <span class="text-error">*</span></label>
+                    <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ form_data.get('tgl_lahir', '') }}" required
+                           class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Jabatan <span class="text-error">*</span></label>
+                    <input type="text" id="jabatan" name="jabatan" value="{{ form_data.get('jabatan', '') }}"
+                           placeholder="Jabatan" required class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Bidang/Seksi <span class="text-error">*</span></label>
+                    <input type="text" id="seksi" name="seksi" value="{{ form_data.get('seksi', '') }}"
+                           placeholder="Bidang atau seksi" required class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Shif</label>
+                    <input type="text" id="shif" name="shif" value="{{ form_data.get('shif', '') }}"
+                           placeholder="Opsional" class="input input-bordered w-full text-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-rule my-4"></div>
+
+        <!-- Detail Cuti -->
+        <div class="mb-5">
+            <h3 class="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-3">Detail Cuti</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Tanggal Mulai <span class="text-error">*</span></label>
+                    <input type="date" id="tgl_mulai" name="tgl_mulai" value="{{ form_data.get('tgl_mulai', '') }}" required
+                           class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Tanggal Selesai <span class="text-error">*</span></label>
+                    <input type="date" id="tgl_selesai" name="tgl_selesai" value="{{ form_data.get('tgl_selesai', '') }}" required
+                           class="input input-bordered w-full text-sm">
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Keperluan <span class="text-error">*</span></label>
+                    <select id="keperluan" name="keperluan" required class="select select-bordered w-full text-sm">
+                        <option value="">-- Pilih --</option>
+                        <option value="Keperluan Keluarga" {{ 'selected' if form_data.get('keperluan') == 'Keperluan Keluarga' }}>Keperluan Keluarga</option>
+                        <option value="Sakit" {{ 'selected' if form_data.get('keperluan') == 'Sakit' }}>Sakit</option>
+                        <option value="Akad Nikah" {{ 'selected' if form_data.get('keperluan') == 'Akad Nikah' }}>Akad Nikah</option>
+                        <option value="Istri Melahirkan" {{ 'selected' if form_data.get('keperluan') == 'Istri Melahirkan' }}>Istri Melahirkan</option>
+                        <option value="Cuti Istirahat/Pemulihan" {{ 'selected' if form_data.get('keperluan') == 'Cuti Istirahat/Pemulihan' }}>Cuti Istirahat/Pemulihan</option>
+                        <option value="Lainnya" {{ 'selected' if form_data.get('keperluan') == 'Lainnya' }}>Lainnya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[13px] font-medium text-ink mb-1">Kabid/Kasi <span class="text-error">*</span></label>
+                    <input type="text" id="kabid_kasi" name="kabid_kasi" value="{{ form_data.get('kabid_kasi', '') }}"
+                           placeholder="Nama atasan" required class="input input-bordered w-full text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-rule">
+            <p class="text-xs text-ink-muted text-center sm:text-left"><span class="text-error">*</span> Wajib diisi</p>
+            <button type="submit" class="btn bg-accent hover:bg-accent-2 text-white border-none text-sm font-semibold w-full sm:w-auto">
+                Kirim Pengajuan
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('nip').addEventListener('blur', async function() {
+    const nip = this.value.trim();
+    const status = document.getElementById('nip-status');
+    if (!nip) { status.textContent = ''; return; }
+    status.textContent = 'Mencari...';
+    status.className = 'text-xs mt-0.5 block text-ink-muted';
+    try {
+        const resp = await fetch(`/api/karyawan/${nip}`);
+        if (resp.ok) {
+            const data = await resp.json();
+            document.getElementById('nama').value = data.nama;
+            document.getElementById('jabatan').value = data.jabatan;
+            document.getElementById('seksi').value = data.seksi;
+            document.getElementById('shif').value = data.shif;
+            document.getElementById('kabid_kasi').value = data.kabid_kasi;
+            status.innerHTML = '<span class="text-success font-medium">✓ NIP ditemukan</span>';
+        } else {
+            status.innerHTML = '<span class="text-error font-medium">✗ NIP tidak ditemukan</span>';
+        }
+    } catch(e) { status.textContent = ''; }
+});
+document.getElementById('formCuti').addEventListener('submit', function(e) {
+    const tgl_mulai = document.getElementById('tgl_mulai').value;
+    const tgl_selesai = document.getElementById('tgl_selesai').value;
+    if (tgl_selesai < tgl_mulai) {
+        e.preventDefault();
+        alert('Tanggal selesai tidak boleh sebelum tanggal mulai.');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+# Environment & secrets
+.env
+*.json
+!package.json
+!package-lock.json
+credentials.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Node
+node_modules/
+
+# Agent / tool configs
+.agents/
+.claude/
+.hallmark/
+.claude/
+skills-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test & temp files
+test_output.docx
+*.log
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="font-display text-display text-ink">Dashboard</h1>
+    <p class="text-ink-muted text-[13px] mt-1">Kelola pengajuan cuti karyawan</p>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
+    <div class="bg-white rounded-card border border-rule p-3 sm:p-4 stat-card-hover">
+        <div class="text-[11px] sm:text-xs text-ink-muted font-medium mb-0.5">Menunggu</div>
+        <div class="text-xl sm:text-2xl font-semibold text-warning">{{ stats.menunggu }}</div>
+    </div>
+    <div class="bg-white rounded-card border border-rule p-3 sm:p-4 stat-card-hover">
+        <div class="text-[11px] sm:text-xs text-ink-muted font-medium mb-0.5">Disetujui</div>
+        <div class="text-xl sm:text-2xl font-semibold text-success">{{ stats.disetujui }}</div>
+    </div>
+    <div class="bg-white rounded-card border border-rule p-3 sm:p-4 stat-card-hover">
+        <div class="text-[11px] sm:text-xs text-ink-muted font-medium mb-0.5">Ditolak</div>
+        <div class="text-xl sm:text-2xl font-semibold text-error">{{ stats.ditolak }}</div>
+    </div>
+    <div class="bg-white rounded-card border border-rule p-3 sm:p-4 stat-card-hover">
+        <div class="text-[11px] sm:text-xs text-ink-muted font-medium mb-0.5">Total</div>
+        <div class="text-xl sm:text-2xl font-semibold text-accent">{{ stats.total }}</div>
+    </div>
+</div>
+
+<!-- Table -->
+<div class="bg-white rounded-card border border-rule p-4 sm:p-6">
+    <!-- Filter — stacks on mobile -->
+    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="mb-4 pb-4 border-b border-rule">
+        <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 items-end">
+            <div>
+                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Status</label>
+                <select name="status" class="select select-bordered select-sm text-[13px] w-full">
+                    <option value="">Menunggu ACC</option>
+                    <option value="Disetujui" {{ 'selected' if status_filter == 'Disetujui' }}>Disetujui</option>
+                    <option value="Ditolak" {{ 'selected' if status_filter == 'Ditolak' }}>Ditolak</option>
+                    <option value="Dibatalkan" {{ 'selected' if status_filter == 'Dibatalkan' }}>Dibatalkan</option>
+                    <option value="Semua" {{ 'selected' if status_filter == 'Semua' }}>Semua</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Bulan</label>
+                <input type="text" name="bulan" placeholder="Juli 2026" value="{{ bulan_filter }}"
+                       class="input input-bordered input-sm text-[13px] w-full">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-ink-muted uppercase tracking-wide mb-1">Seksi</label>
+                <select name="seksi" class="select select-bordered select-sm text-[13px] w-full">
+                    <option value="">Semua</option>
+                    {% for s in semua_seksi %}
+                    <option value="{{ s }}" {{ 'selected' if seksi_filter == s }}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="btn btn-sm bg-accent hover:bg-accent-2 text-white border-none text-[13px] font-semibold w-full">
+                    Filter
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {% if pengajuan %}
+    <div class="table-wrap">
+        <table class="table table-zebra table-sm">
+            <thead class="thead-accent">
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>NIP</th>
+                    <th>Tanggal</th>
+                    <th>Keperluan</th>
+                    <th>Seksi</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pengajuan %}
+                <tr>
+                    <td class="text-ink-muted text-xs">{{ loop.index }}</td>
+                    <td class="font-medium text-[13px]">{{ p.get('NAMA', '-') }}</td>
+                    <td class="font-mono text-xs text-ink-muted">{{ p.get('NIP', '-') }}</td>
+                    <td class="text-[13px] whitespace-nowrap">{{ p.get('HARI', '-') }}</td>
+                    <td class="text-[13px]">{{ p.get('KEPERLUAN', '-') }}</td>
+                    <td class="text-[13px] text-ink-muted">{{ p.get('SEKSI', '-') }}</td>
+                    <td>
+                        {% set status = p.get('STATUS', '').strip() %}
+                        {% if status == 'Menunggu ACC' %}
+                        <span class="badge badge-warning badge-sm">Menunggu</span>
+                        {% elif status == 'Disetujui' %}
+                        <span class="badge badge-success badge-sm">Disetujui</span>
+                        {% elif status == 'Ditolak' %}
+                        <span class="badge badge-error badge-sm">Ditolak</span>
+                        {% elif status == 'Dibatalkan' %}
+                        <span class="badge badge-ghost badge-sm">Batal</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="flex gap-1">
+                            <a href="{{ url_for('admin.detail', row_num=p._row) }}" class="btn btn-xs btn-ghost text-accent text-[12px]">Detail</a>
+                            <a href="{{ url_for('admin.generate_surat_route', row_num=p._row) }}" class="btn btn-xs btn-ghost text-ink-muted text-[12px]">Surat</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p class="empty-state-text">Tidak ada pengajuan ditemukan</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+from flask import Flask
+from flask_login import LoginManager
+from config.settings import SECRET_KEY, SESSION_TIMEOUT_MINUTES, ADMIN_USERNAME
+from datetime import timedelta
+from models import AdminUser
+
+
+def create_app():
+    app = Flask(__name__)
+    app.secret_key = SECRET_KEY
+    app.permanent_session_lifetime = timedelta(minutes=SESSION_TIMEOUT_MINUTES)
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = True  # HTTPS only in production
+
+    # CSRF handled manually via services/security.py
+    app.config["WTF_CSRF_ENABLED"] = False
+
+    # Security headers on every response
+    from services.security import add_security_headers, generate_csrf_token
+    app.after_request(add_security_headers)
+
+    # Inject CSRF token into all templates
+    @app.context_processor
+    def inject_csrf():
+        return dict(csrf_token=generate_csrf_token)
+
+    # Login manager
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = "admin.login"
+    login_manager.login_message = "Silakan login terlebih dahulu."
+    login_manager.login_message_category = "warning"
+
+    @login_manager.user_loader
+    def load_user(username):
+        if username == ADMIN_USERNAME:
+            return AdminUser(username)
+        return None
+
+    # Register blueprints — import here to avoid circular import
+    from routes.public import public_bp
+    from routes.admin import admin_bp
+
+    app.register_blueprint(public_bp)
+    app.register_blueprint(admin_bp, url_prefix="/admin")
+
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(e):
+        return "Halaman tidak ditemukan", 404
+
+    @app.errorhandler(500)
+    def server_error(e):
+        return "Terjadi kesalahan server", 500
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return f"Akses ditolak: {e.description}", 403
+
+    @app.errorhandler(429)
+    def too_many_requests(e):
+        return f"Terlalu banyak permintaan: {e.description}", 429
+
+    # Pre-warm Google Sheets connection + data cache at startup
+    with app.app_context():
+        try:
+            from services.sheets_service import get_all_records
+            get_all_records("KARYAWAN")
+            get_all_records("CUTI 2026")
+            print("Sheets cache warmed")
+        except Exception as e:
+            print(f"Sheets warm-up failed (will retry on first request): {e}")
+
+    return app
+
+
+app = create_app()
+
+if __name__ == "__main__":
+    # In development, allow HTTP (disable Secure cookie flag)
+    app.config["SESSION_COOKIE_SECURE"] = False
+    app.run(debug=True)
