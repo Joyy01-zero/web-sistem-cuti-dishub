@@ -119,7 +119,7 @@ def get_karyawan_by_nip(nip):
 
 def get_pengajuan_by_nip(nip):
     records = get_all_records(SHEET_CUTI)
-    return [r for r in records if str(r.get("NI PPPK PW", "")).strip() == str(nip).strip()]
+    return [r for r in records if str(r.get("NIP", "")).strip() == str(nip).strip()]
 
 
 def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=None):
