@@ -5,6 +5,9 @@
 !package-lock.json
 credentials.json
 
+# Template surat (contains real employee data)
+template_surat/
+
 # Python
 venv/
 __pycache__/
