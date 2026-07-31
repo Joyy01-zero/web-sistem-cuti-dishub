@@ -1,4 +1,5 @@
 from docx import Document
+from config.constants import BULAN_NAMA
 import io
 import os
 import copy
@@ -77,15 +78,11 @@ def generate_surat(data: dict) -> bytes:
         no_surat_replacements = {}
 
     # Tanggal surat (bagian 2) — replace "Maret 2026"
-    bulan_nama = [
-        "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-    ]
     if tgl_submit:
         try:
             from datetime import datetime
             dt = datetime.strptime(tgl_submit[:10], "%Y-%m-%d")
-            tgl_str = f"{bulan_nama[dt.month]} {dt.year}"
+            tgl_str = f"{BULAN_NAMA[dt.month]} {dt.year}"
         except Exception:
             tgl_str = tgl_submit
     else:

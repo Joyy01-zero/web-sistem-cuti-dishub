@@ -3,13 +3,15 @@
 /* Base */
 body {
     font-family: 'Geist', system-ui, -apple-system, sans-serif;
+    color: #1a1a2e;
     color: oklch(var(--bc));
+    background-color: #f5f6f9;
     background-color: oklch(var(--b1));
     -webkit-font-smoothing: antialiased;
-    overflow-x: clip;
+    overflow-x: hidden;
 }
 html {
-    overflow-x: clip;
+    overflow-x: hidden;
 }
 
 /* Display heading */

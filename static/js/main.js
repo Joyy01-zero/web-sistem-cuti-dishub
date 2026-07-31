@@ -24,6 +24,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Mobile menu toggle
+document.addEventListener('DOMContentLoaded', function () {
+    var menuBtn = document.getElementById('mobile-menu-btn');
+    var menu = document.getElementById('mobile-menu');
+    if (menuBtn && menu) {
+        menuBtn.addEventListener('click', function () {
+            menu.classList.toggle('hidden');
+        });
+    }
+});
+
 // Dark mode toggle
 (function () {
     var THEME_KEY = 'dishub-theme';

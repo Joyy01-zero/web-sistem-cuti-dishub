@@ -31,6 +31,14 @@
 | 3 | HIGH | LOW | X-Forwarded-For spoofable | ✅ Fix |
 | 4 | HIGH | LOW | get_karyawan_by_nip mutate cache | ✅ Fix |
 | 5 | MEDIUM | LOW | Cross-month date display salah | ✅ Fix |
+| 18 | LOW | LOW | autocomplete="off" di NIP field | ✅ Fix |
+| 19 | LOW | LOW | Default status option confusing | ✅ Fix |
+| 20 | LOW | LOW | No SEO meta tags | ✅ Fix |
+| 21 | LOW | LOW | Inline onclick di mobile menu | ✅ Fix |
+| 22 | LOW | LOW | Duplicate bulan_nama array | ✅ Fix |
+| 23 | LOW | LOW | oklch() tidak support browser lama | ✅ Fix |
+| 24 | LOW | LOW | overflow-x: clip limited support | ✅ Fix |
+| 25 | LOW | LOW | DaisyUI version coupling | ✅ Fix |
 
 ---
 

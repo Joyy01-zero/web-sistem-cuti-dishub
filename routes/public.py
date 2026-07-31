@@ -7,6 +7,7 @@ from services.sheets_service import (
 )
 from services.kuota_service import boleh_ajukan, sisa_kuota, get_tahun_sekarang
 from config.settings import SHEET_CUTI
+from config.constants import BULAN_NAMA
 from services.security import validate_csrf, rate_limit, get_real_ip, safe_error_message
 
 public_bp = Blueprint("public", __name__)
@@ -70,25 +71,21 @@ def form_cuti():
             return render_template("form_cuti.html", form_data=request.form)
 
         # Format hari
-        bulan_nama = [
-            "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-            "Juli", "Agustus", "September", "Oktober", "November", "Desember",
-        ]
-        if tgl_mulai == tgl_selesai:
-            hari = f"{tgl_mulai_dt.day} {bulan_nama[tgl_mulai_dt.month]} {tgl_mulai_dt.year}"
+
+            hari = f"{tgl_mulai_dt.day} {BULAN_NAMA[tgl_mulai_dt.month]} {tgl_mulai_dt.year}"
         elif tgl_mulai_dt.month != tgl_selesai_dt.month or tgl_mulai_dt.year != tgl_selesai_dt.year:
             # Cross-month or cross-year: show full dates for both
             hari = (
-                f"{tgl_mulai_dt.day} {bulan_nama[tgl_mulai_dt.month]} {tgl_mulai_dt.year} "
-                f"s.d. {tgl_selesai_dt.day} {bulan_nama[tgl_selesai_dt.month]} {tgl_selesai_dt.year}"
+                f"{tgl_mulai_dt.day} {BULAN_NAMA[tgl_mulai_dt.month]} {tgl_mulai_dt.year} "
+                f"s.d. {tgl_selesai_dt.day} {BULAN_NAMA[tgl_selesai_dt.month]} {tgl_selesai_dt.year}"
             )
         else:
             hari = (
                 f"{tgl_mulai_dt.day} s.d. {tgl_selesai_dt.day} "
-                f"{bulan_nama[tgl_selesai_dt.month]} {tgl_selesai_dt.year}"
+                f"{BULAN_NAMA[tgl_selesai_dt.month]} {tgl_selesai_dt.year}"
             )
 
-        bulan_str = f"{bulan_nama[tgl_mulai_dt.month]} {tgl_mulai_dt.year}"
+        bulan_str = f"{BULAN_NAMA[tgl_mulai_dt.month]} {tgl_mulai_dt.year}"
 
         # Tulis ke Sheets
         data = {
