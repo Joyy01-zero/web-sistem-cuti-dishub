@@ -15,6 +15,18 @@
 | # | Severity | Fix Risk | Temuan | Status |
 |---|----------|----------|--------|--------|
 | 1 | CRITICAL | LOW | SECRET_KEY default `"change-me-in-production"` | ✅ Fix |
+| 6 | HIGH | LOW | Debug mode in production | ✅ Fix |
+| 7 | HIGH | MEDIUM | Credential JSON tracked in git | ✅ Fix |
+| 8 | MEDIUM | LOW | X-XSS-Protection deprecated | ✅ Fix |
+| 9 | MEDIUM | LOW | Admin username hardcoded | ✅ Fix |
+| 10 | MEDIUM | LOW | KUOTA_TAHUNAN hardcoded | ✅ Fix |
+| 11 | MEDIUM | MEDIUM | SHEET_CUTI tahun hardcoded | ✅ Fix |
+| 12 | MEDIUM | LOW | Hardcoded template path | ✅ Fix |
+| 13 | MEDIUM | LOW | Dead code NAMA_KARYAWAN | ✅ Fix |
+| 14 | MEDIUM | LOW | Race condition append_row return | ✅ Fix |
+| 15 | MEDIUM | LOW | Dead code pending_nip | ✅ Fix |
+| 16 | MEDIUM | LOW | Flash auto-dismiss | ✅ Fix |
+| 17 | LOW | LOW | Duplicate .claude/ | ✅ Fix |
 | 2 | HIGH | LOW | update_row_status ignore no_surat | ✅ Fix |
 | 3 | HIGH | LOW | X-Forwarded-For spoofable | ✅ Fix |
 | 4 | HIGH | LOW | get_karyawan_by_nip mutate cache | ✅ Fix |

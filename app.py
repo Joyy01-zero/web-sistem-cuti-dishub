@@ -88,4 +88,4 @@ app = create_app()
 if __name__ == "__main__":
     # In development, allow HTTP (disable Secure cookie flag)
     app.config["SESSION_COOKIE_SECURE"] = False
-    app.run(debug=True)
+    app.run(debug=os.environ.get('FLASK_DEBUG', '0') == '1')

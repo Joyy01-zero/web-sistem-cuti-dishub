@@ -4,6 +4,7 @@
 !package.json
 !package-lock.json
 credentials.json
+sistem-cuti-dishub-*.json
 
 # Template surat (contains real employee data)
 template_surat/
@@ -21,7 +22,6 @@ node_modules/
 .agents/
 .claude/
 .hallmark/
-.claude/
 skills-lock.json
 
 # OS

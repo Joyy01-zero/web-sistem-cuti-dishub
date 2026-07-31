@@ -149,7 +149,7 @@ def append_row(sheet_name, data: dict):
     row = [data.get(h, "") for h in headers]
     sheet.append_row(row)
     invalidate_cache(sheet_name)
-    return len(sheet.get_all_values())
+    return None
 
 
 def update_cell(sheet_name, row_num, col_name, value):

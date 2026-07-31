@@ -139,22 +139,22 @@
             <div class="mb-4 space-y-2">
                 {% for category, message in messages %}
                 {% if category == 'success' %}
-                <div class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-green-50 border border-green-200 text-green-800 text-[13px]">
+                <div class="flash-message flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 text-[13px]">
                     <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span>{{ message }}</span>
                 </div>
                 {% elif category == 'danger' %}
-                <div class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-[13px]">
+                <div class="flash-message flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 text-[13px]">
                     <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span>{{ message }}</span>
                 </div>
                 {% elif category == 'warning' %}
-                <div class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[13px]">
+                <div class="flash-message flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 text-[13px]">
                     <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                     <span>{{ message }}</span>
                 </div>
                 {% else %}
-                <div class="flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-[13px]">
+                <div class="flash-message flex items-start gap-2.5 px-3 py-2.5 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 text-[13px]">
                     <svg class="w-4 h-4 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span>{{ message }}</span>
                 </div>

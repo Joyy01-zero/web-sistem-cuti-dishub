@@ -51,7 +51,7 @@ def login():
 
         # Always verify password even if username wrong (timing attack prevention)
         password_ok = verify_password(password)
-        username_ok = (username == "admin_kepegawaian")
+        username_ok = (username == ADMIN_USERNAME)
 
         if username_ok and password_ok:
             clear_attempts(ip)

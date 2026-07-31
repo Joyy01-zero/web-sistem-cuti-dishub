@@ -28,10 +28,11 @@ RESMI_REPLACEMENTS = {
 }
 
 # Nama yang muncul di Bagian 2 (karyawan)
-NAMA_KARYAWAN_BAGIAN2 = "WAHYU EKO SAPUTRO"
 
 
 def generate_surat(data: dict) -> bytes:
+    if not os.path.exists(TEMPLATE_PATH):
+        raise FileNotFoundError(f"Template surat tidak ditemukan: {TEMPLATE_PATH}")
     doc = Document(TEMPLATE_PATH)
 
     nama = data.get("NAMA", "")

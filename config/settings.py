@@ -16,7 +16,7 @@ ADMIN_PASSWORD_HASH = os.environ.get("ADMIN_PASSWORD_HASH", "")
 GOOGLE_CREDENTIALS_JSON = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")
 
 # Kuota cuti per tahun
-KUOTA_TAHUNAN = 12
+KUOTA_TAHUNAN = int(os.environ.get("KUOTA_TAHUNAN", "12"))
 
 # Instansi
 NAMA_INSTANSI = "Dinas Perhubungan Kota Bogor"
@@ -31,5 +31,5 @@ LOGIN_LOCKOUT_MINUTES = 15
 MAX_SUBMIT_PER_HOUR = 10
 
 # Sheet names
-SHEET_CUTI = "CUTI 2026"
+SHEET_CUTI = os.environ.get("SHEET_CUTI", "CUTI " + str(__import__("datetime").datetime.now().year))
 SHEET_KARYAWAN = "DATA_KARYAWAN"

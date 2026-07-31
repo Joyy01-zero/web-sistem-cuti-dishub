@@ -193,22 +193,4 @@ def cek_status():
             submitted=True,
         )
 
-    # GET: check if we have a pending_nip from form submission redirect
-    pending_nip = session.pop('pending_nip', None)
-    if pending_nip:
-        karyawan = get_karyawan_by_nip(pending_nip)
-        if karyawan:
-            pengajuan = get_pengajuan_by_nip(pending_nip)
-            tahun = get_tahun_sekarang()
-            sisa = sisa_kuota(pending_nip, tahun)
-            return render_template(
-                "cek_status.html",
-                pengajuan=pengajuan,
-                nama=karyawan.get("NAMA", ""),
-                nip=pending_nip,
-                sisa_kuota=sisa,
-                tahun=tahun,
-                submitted=True,
-            )
-
     return render_template("cek_status.html", submitted=False)
