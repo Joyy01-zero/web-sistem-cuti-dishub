@@ -1,4 +1,4 @@
-from config.settings import SHEET_CUTI, KUOTA_TAHUNAN
+from config.settings import SHEET_CUTI, KUOTA_TAHUNAN, ADMIN_USERNAME
 from flask import (
     Blueprint,
     render_template,
