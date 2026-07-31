@@ -184,7 +184,7 @@ def update_status(row_num):
         return redirect(url_for("admin.detail", row_num=row_num))
 
     try:
-        update_row_status(SHEET_CUTI, row_num, status, no_surat if status == "Disetujui" else None)
+        update_row_status(SHEET_CUTI, row_num, status, no_surat or None)
         flash(f"Status berhasil diubah ke {status}.", "success")
     except Exception as e:
         flash(safe_error_message(e, "update status"), "danger")
