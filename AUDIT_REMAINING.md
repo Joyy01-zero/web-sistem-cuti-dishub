@@ -325,16 +325,7 @@
 | 9 | CODE-3 | MEDIUM | LOW | KUOTA_TAHUNAN hardcoded |
 | 10 | UX-1 | MEDIUM | LOW | Flash auto-dismiss |
 | 11 | SEC-3 | HIGH | MEDIUM | Credential JSON in git |
-| 12 | SEC-5 | MEDIUM | MEDIUM | GET form rate limited |
-| 13 | SEC-6 | MEDIUM | MEDIUM | Rate limit memory leak |
-| 14 | SEC-7 | MEDIUM | MEDIUM | Logout via GET |
-| 15 | BUG-1 | HIGH | MEDIUM | append_row hardcoded row 1 |
-| 16 | PERF-1 | HIGH | MEDIUM | N+1 queries histori |
-| 17 | PERF-3 | MEDIUM | MEDIUM | detail() 2x API calls |
-| 18 | CODE-4 | MEDIUM | MEDIUM | SHEET_CUTI tahun hardcoded |
-| 19 | UX-2 | MEDIUM | MEDIUM | No loading state |
-| 20 | COMP-1 | MEDIUM | MEDIUM | Requirements pinning |
-| 21 | SEC-2 | HIGH | HIGH | CSP unsafe-inline |
+| 12 | SEC-5 | MEDIUM | MEDIUM | GET form rate limited | | ✅ Fix | 13 | SEC-6 | MEDIUM | MEDIUM | Rate limit memory leak | | ✅ Fix | 14 | SEC-7 | MEDIUM | MEDIUM | Logout via GET | | ✅ Fix | 15 | BUG-1 | HIGH | MEDIUM | append_row hardcoded row 1 | | ✅ Fix | 16 | PERF-1 | HIGH | MEDIUM | N+1 queries histori | | ✅ Fix | 17 | PERF-3 | MEDIUM | MEDIUM | detail() 2x API calls | | ✅ Fix | 18 | CODE-4 | MEDIUM | MEDIUM | SHEET_CUTI tahun hardcoded | | ✅ Fix | 19 | UX-2 | MEDIUM | MEDIUM | No loading state | | ✅ Fix | 20 | COMP-1 | MEDIUM | MEDIUM | Requirements pinning | | ✅ Fix | 21 | SEC-2 | HIGH | HIGH | CSP unsafe-inline |
 | 22 | BUG-2 | HIGH | HIGH | Row-based detail fragile |
 | 23 | BUG-4 | MEDIUM | HIGH | Login lockout not shared |
 | — | Sisanya (LOW severity) | LOW | LOW | 14 temuan minor |

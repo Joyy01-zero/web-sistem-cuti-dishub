@@ -13,7 +13,7 @@ public_bp = Blueprint("public", __name__)
 
 
 @public_bp.route("/", methods=["GET", "POST"])
-@rate_limit(max_requests=10, window_seconds=3600)  # 10 submit per jam per IP
+@rate_limit(max_requests=10, window_seconds=3600, methods=["POST"])  # 10 submit per jam per IP (GET not limited)
 def form_cuti():
     if request.method == "POST":
         validate_csrf()  # CSRF check

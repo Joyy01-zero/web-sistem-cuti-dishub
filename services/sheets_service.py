@@ -5,6 +5,11 @@ import os
 import time
 from config.settings import SHEET_CUTI, SHEET_KARYAWAN
 
+
+class SheetNotFoundError(Exception):
+    """Raised when a requested worksheet is not found in the spreadsheet."""
+    pass
+
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive",
@@ -44,7 +49,13 @@ def get_sheet(sheet_name):
 
     client = get_sheets_client()
     spreadsheet = client.open_by_key(SPREADSHEET_ID)
-    sheet = spreadsheet.worksheet(sheet_name)
+    try:
+        sheet = spreadsheet.worksheet(sheet_name)
+    except gspread.exceptions.WorksheetNotFound:
+        raise SheetNotFoundError(
+            f"Sheet '{sheet_name}' tidak ditemukan. "
+            "Pastikan nama sheet benar di config/settings.py"
+        )
     _worksheet_cache["sheets"][cache_key] = sheet
     _worksheet_cache["ts"] = now
     return sheet
@@ -143,9 +154,9 @@ def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=
     return result
 
 
-def append_row(sheet_name, data: dict):
+def append_row(sheet_name, data: dict, head_row=1):
     sheet = get_sheet(sheet_name)
-    headers = sheet.row_values(1)
+    headers = sheet.row_values(head_row)
     row = [data.get(h, "") for h in headers]
     sheet.append_row(row)
     invalidate_cache(sheet_name)

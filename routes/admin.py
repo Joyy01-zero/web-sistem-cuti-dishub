@@ -1,4 +1,4 @@
-from config.settings import SHEET_CUTI
+from config.settings import SHEET_CUTI, KUOTA_TAHUNAN
 from flask import (
     Blueprint,
     render_template,
@@ -20,9 +20,8 @@ from services.sheets_service import (
     get_all_seksi,
     get_stats,
     update_row_status,
-    get_sheet,
 )
-from services.kuota_service import sisa_kuota, hitung_kuota_terpakai, get_tahun_sekarang
+from services.kuota_service import get_tahun_sekarang
 from services.surat_service import generate_surat
 from services.security import validate_csrf, get_real_ip, safe_error_message
 from datetime import datetime
@@ -74,9 +73,10 @@ def login():
     return render_template("login.html")
 
 
-@admin_bp.route("/logout")
+@admin_bp.route("/logout", methods=["POST"])
 @login_required
 def logout():
+    validate_csrf()  # CSRF check
     logout_user()
     flash("Anda telah logout.", "info")
     return redirect(url_for("admin.login"))
@@ -113,13 +113,13 @@ def detail(row_num):
     if row_num < 2:
         abort(404)
 
-    sheet = get_sheet(SHEET_CUTI)
     try:
-        row = sheet.row_values(row_num)
-        headers = sheet.row_values(1)
-        if len(row) < len(headers):
-            row.extend([""] * (len(headers) - len(row)))
-        data = dict(zip(headers, row))
+        records = get_all_records(SHEET_CUTI)
+        idx = row_num - 2  # 0-indexed in records list (row 1 = header, row 2 = first record)
+        if idx < 0 or idx >= len(records):
+            flash("Data tidak ditemukan.", "danger")
+            return redirect(url_for("admin.dashboard"))
+        data = records[idx]
     except Exception:
         flash("Data tidak ditemukan.", "danger")
         return redirect(url_for("admin.dashboard"))
@@ -133,13 +133,13 @@ def generate_surat_route(row_num):
     if row_num < 2:
         abort(404)
 
-    sheet = get_sheet(SHEET_CUTI)
     try:
-        row = sheet.row_values(row_num)
-        headers = sheet.row_values(1)
-        if len(row) < len(headers):
-            row.extend([""] * (len(headers) - len(row)))
-        data = dict(zip(headers, row))
+        records = get_all_records(SHEET_CUTI)
+        idx = row_num - 2
+        if idx < 0 or idx >= len(records):
+            flash("Data tidak ditemukan.", "danger")
+            return redirect(url_for("admin.dashboard"))
+        data = records[idx]
     except Exception:
         flash("Data tidak ditemukan.", "danger")
         return redirect(url_for("admin.dashboard"))
@@ -214,15 +214,28 @@ def histori():
     semua_seksi = get_all_seksi()
 
     tahun = int(tahun_filter) if tahun_filter else get_tahun_sekarang()
-    karyawan_kuota = {}
+
+    # Build a single index: count "Disetujui" per NIP for the target year
+    # This eliminates N+1 calls to hitung_kuota_terpakai()
+    kuota_index = {}  # nip -> count of Disetujui records
+    nama_index = {}   # nip -> nama (first occurrence)
     for r in semua:
         nip = str(r.get("NIP", "")).strip()
-        if nip and nip not in karyawan_kuota:
-            karyawan_kuota[nip] = {
-                "nama": r.get("NAMA", ""),
-                "terpakai": hitung_kuota_terpakai(nip, tahun),
-                "sisa": sisa_kuota(nip, tahun),
-            }
+        if not nip:
+            continue
+        if nip not in nama_index:
+            nama_index[nip] = r.get("NAMA", "")
+        if str(r.get("TAHUN", "")) == str(tahun) and r.get("STATUS", "").strip() == "Disetujui":
+            kuota_index[nip] = kuota_index.get(nip, 0) + 1
+
+    karyawan_kuota = {}
+    for nip in nama_index:
+        terpakai = kuota_index.get(nip, 0)
+        karyawan_kuota[nip] = {
+            "nama": nama_index[nip],
+            "terpakai": terpakai,
+            "sisa": KUOTA_TAHUNAN - terpakai,
+        }
 
     return render_template(
         "histori.html",

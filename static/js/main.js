@@ -10,6 +10,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Loading state on form submit — disables submit button to prevent double-clicks
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('form').forEach(function (form) {
+        form.addEventListener('submit', function () {
+            var btn = form.querySelector('button[type="submit"]');
+            if (btn && !btn.disabled) {
+                btn.disabled = true;
+                btn.dataset.originalText = btn.textContent;
+                btn.textContent = 'Memproses...';
+            }
+        });
+    });
+});
+
 // Dark mode toggle
 (function () {
     var THEME_KEY = 'dishub-theme';

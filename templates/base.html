@@ -50,10 +50,13 @@
                           {% if request.endpoint == 'admin.histori' %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:text-base-content hover:bg-base-200{% endif %}">
                     Histori
                 </a>
-                <a href="{{ url_for('admin.logout') }}"
-                   class="ml-1 px-3 py-1.5 rounded text-[13px] font-medium whitespace-nowrap text-error hover:bg-red-50 transition-colors">
-                    Logout
-                </a>
+                <form action="{{ url_for('admin.logout') }}" method="POST" style="display:inline">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit"
+                            class="ml-1 px-3 py-1.5 rounded text-[13px] font-medium whitespace-nowrap text-error hover:bg-red-50 transition-colors">
+                        Logout
+                    </button>
+                </form>
                 {% else %}
                 <a href="{{ url_for('admin.login') }}"
                    class="ml-1 px-3.5 py-1.5 rounded text-[13px] font-semibold whitespace-nowrap text-primary-content bg-primary hover:opacity-90 transition-colors">
@@ -116,10 +119,13 @@
                           {% if request.endpoint == 'admin.histori' %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:bg-base-200{% endif %}">
                     Histori
                 </a>
-                <a href="{{ url_for('admin.logout') }}"
-                   class="block px-3 py-2.5 rounded text-[14px] font-medium text-error">
-                    Logout
-                </a>
+                <form action="{{ url_for('admin.logout') }}" method="POST">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit"
+                            class="w-full text-left px-3 py-2.5 rounded text-[14px] font-medium text-error">
+                        Logout
+                    </button>
+                </form>
                 {% else %}
                 <div class="border-t border-base-300 my-1.5"></div>
                 <a href="{{ url_for('admin.login') }}"

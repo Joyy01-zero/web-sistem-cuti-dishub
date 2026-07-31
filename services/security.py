@@ -6,6 +6,7 @@ import hmac
 import os
 import time
 import secrets
+import threading
 from functools import wraps
 from flask import request, session, abort, g
 
@@ -34,35 +35,79 @@ def validate_csrf():
 # Rate Limiting (in-memory, per-IP)
 # ============================================================
 
-_rate_limits = {}  # ip -> {"endpoint": [(timestamp, ...)]}
+_rate_limits = {}  # ip -> {\"endpoint\": [(timestamp, ...)]}
+_rate_limit_lock = threading.Lock()
+_rate_limit_cleanup_counter = 0
+RATE_LIMIT_CLEANUP_INTERVAL = 100  # run global cleanup every N requests
 
 
-def rate_limit(max_requests, window_seconds, key_func=None):
+def _cleanup_stale_keys():
+    """Remove keys where all timestamps have expired. Thread-safe."""
+    now = time.time()
+    # Use a snapshot of keys to avoid RuntimeError during iteration
+    with _rate_limit_lock:
+        keys_to_check = list(_rate_limits.keys())
+    stale_keys = []
+    for key in keys_to_check:
+        with _rate_limit_lock:
+            timestamps = _rate_limits.get(key, [])
+            if not timestamps:
+                stale_keys.append(key)
+            else:
+                # Check if ALL timestamps are expired (max timestamp is old)
+                if max(timestamps) < now - 7200:  # 2 hour max window
+                    stale_keys.append(key)
+    if stale_keys:
+        with _rate_limit_lock:
+            for key in stale_keys:
+                _rate_limits.pop(key, None)
+
+
+def rate_limit(max_requests, window_seconds, key_func=None, methods=None):
     """
     Decorator: limit requests per IP per time window.
     key_func(request) -> str for custom key (default: remote_addr).
+    methods: list of HTTP methods to rate-limit (default: all). E.g. ["POST"].
     """
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
+            # Skip rate limiting if method not in target methods
+            if methods and request.method not in methods:
+                return f(*args, **kwargs)
+
+            global _rate_limit_cleanup_counter
+            _rate_limit_cleanup_counter += 1
+
+            # Periodic global cleanup of stale keys
+            if _rate_limit_cleanup_counter % RATE_LIMIT_CLEANUP_INTERVAL == 0:
+                _cleanup_stale_keys()
+
             ip = get_real_ip()
             key = key_func(request) if key_func else ip
             cache_key = f"{f.__name__}:{key}"
             now = time.time()
             cutoff = now - window_seconds
 
-            if cache_key not in _rate_limits:
-                _rate_limits[cache_key] = []
+            with _rate_limit_lock:
+                if cache_key not in _rate_limits:
+                    _rate_limits[cache_key] = []
 
-            # Prune old entries
-            _rate_limits[cache_key] = [
-                t for t in _rate_limits[cache_key] if t > cutoff
-            ]
+                # Prune old entries
+                _rate_limits[cache_key] = [
+                    t for t in _rate_limits[cache_key] if t > cutoff
+                ]
 
-            if len(_rate_limits[cache_key]) >= max_requests:
-                abort(429, description="Terlalu banyak percobaan. Coba lagi nanti.")
+                # Remove key entirely if empty after pruning
+                if not _rate_limits[cache_key]:
+                    del _rate_limits[cache_key]
+                    _rate_limits[cache_key] = []
 
-            _rate_limits[cache_key].append(now)
+                if len(_rate_limits[cache_key]) >= max_requests:
+                    abort(429, description="Terlalu banyak percobaan. Coba lagi nanti.")
+
+                _rate_limits[cache_key].append(now)
+
             return f(*args, **kwargs)
         return wrapper
     return decorator
