@@ -46,7 +46,7 @@
                 </select>
             </div>
             <div class="col-span-2 sm:col-span-1 flex gap-2">
-                <button type="submit" class="btn btn-sm bg-accent hover:bg-accent-2 text-white border-none text-[13px] font-semibold flex-1 sm:flex-none">
+                <button type="submit" class="btn btn-sm bg-primary hover:bg-primary-2 text-white border-none text-[13px] font-semibold flex-1 sm:flex-none">
                     Filter
                 </button>
                 <a href="{{ url_for('admin.export_excel', tahun=tahun_filter) }}"
@@ -63,7 +63,7 @@
     <div class="table-wrap mb-4">
         <table class="table table-zebra table-sm">
             <thead>
-                <tr class="bg-paper-2">
+                <tr class="bg-base-200">
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">NIP</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Nama</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Pakai</th>

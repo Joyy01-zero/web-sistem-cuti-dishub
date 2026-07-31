@@ -23,7 +23,7 @@
     </div>
     <div class="bg-base-100 rounded-card border border-base-300 p-3 sm:p-4 stat-card-hover">
         <div class="text-[11px] sm:text-xs text-base-content/50 font-medium mb-0.5">Total</div>
-        <div class="text-xl sm:text-2xl font-semibold text-accent">{{ stats.total }}</div>
+        <div class="text-xl sm:text-2xl font-semibold text-primary">{{ stats.total }}</div>
     </div>
 </div>
 
@@ -62,7 +62,7 @@
                 </select>
             </div>
             <div class="flex items-end">
-                <button type="submit" class="btn btn-sm bg-accent hover:bg-accent-2 text-white border-none text-[13px] font-semibold w-full">
+                <button type="submit" class="btn btn-sm bg-primary hover:bg-primary-2 text-white border-none text-[13px] font-semibold w-full">
                     Filter
                 </button>
             </div>
@@ -107,7 +107,7 @@
                     </td>
                     <td>
                         <div class="flex gap-1">
-                            <a href="{{ url_for('admin.detail', row_num=p._row) }}" class="btn btn-xs btn-ghost text-accent text-[12px]">Detail</a>
+                            <a href="{{ url_for('admin.detail', row_num=p._row) }}" class="btn btn-xs btn-ghost text-primary text-[12px]">Detail</a>
                             <a href="{{ url_for('admin.generate_surat_route', row_num=p._row) }}" class="btn btn-xs btn-ghost text-base-content/50 text-[12px]">Surat</a>
                         </div>
                     </td>
