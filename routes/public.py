@@ -4,6 +4,7 @@ from services.sheets_service import (
     get_karyawan_by_nip,
     get_pengajuan_by_nip,
     append_row,
+    generate_pengajuan_id,
 )
 from services.kuota_service import boleh_ajukan, sisa_kuota, get_tahun_sekarang
 from config.settings import SHEET_CUTI
@@ -71,7 +72,7 @@ def form_cuti():
             return render_template("form_cuti.html", form_data=request.form)
 
         # Format hari
-
+        if tgl_mulai_dt.date() == tgl_selesai_dt.date():
             hari = f"{tgl_mulai_dt.day} {BULAN_NAMA[tgl_mulai_dt.month]} {tgl_mulai_dt.year}"
         elif tgl_mulai_dt.month != tgl_selesai_dt.month or tgl_mulai_dt.year != tgl_selesai_dt.year:
             # Cross-month or cross-year: show full dates for both
@@ -102,6 +103,7 @@ def form_cuti():
             "STATUS": "Menunggu ACC",
             "TGL_SUBMIT": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "TAHUN": str(tahun),
+            "ID": generate_pengajuan_id(),
         }
 
         try:

@@ -97,30 +97,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-document.getElementById('nip').addEventListener('blur', async function() {
-    const nip = this.value.trim();
-    const status = document.getElementById('nip-status');
-    if (!nip) { status.textContent = ''; return; }
-    status.textContent = 'Mencari...';
-    status.className = 'text-xs mt-0.5 block text-base-content/50';
-    try {
-        const resp = await fetch(`/api/karyawan/validate/${nip}`);
-        const data = await resp.json();
-        if (data.valid) {
-            status.innerHTML = '<span class="text-success font-medium">✓ NIP terdaftar</span>';
-        } else {
-            status.innerHTML = '<span class="text-error font-medium">✗ NIP tidak terdaftar</span>';
-        }
-    } catch(e) { status.textContent = ''; }
-});
-document.getElementById('formCuti').addEventListener('submit', function(e) {
-    const tgl_mulai = document.getElementById('tgl_mulai').value;
-    const tgl_selesai = document.getElementById('tgl_selesai').value;
-    if (tgl_selesai < tgl_mulai) {
-        e.preventDefault();
-        alert('Tanggal selesai tidak boleh sebelum tanggal mulai.');
-    }
-});
-</script>
+<script src="{{ url_for('static', filename='js/form-cuti.js') }}"></script>
 {% endblock %}

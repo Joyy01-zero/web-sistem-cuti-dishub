@@ -6,6 +6,7 @@ charset-normalizer==3.4.9
 click==8.4.2
 colorama==0.4.6
 et_xmlfile==2.0.0
+filelock==3.32.2
 Flask==3.0.3
 Flask-Login==0.6.3
 google-auth==2.30.0

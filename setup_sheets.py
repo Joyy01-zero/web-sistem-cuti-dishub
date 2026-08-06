@@ -4,6 +4,7 @@ Requires: .env with GOOGLE_CREDENTIALS_JSON and SPREADSHEET_ID set.
 """
 import os
 from dotenv import load_dotenv
+from config.settings import SHEET_CUTI
 from services.sheets_service import get_sheets_client
 
 load_dotenv()
@@ -19,20 +20,20 @@ def setup():
     print(f"Spreadsheet: {spreadsheet.title}")
     print(f"Existing sheets: {existing}")
 
-    # Sheet 1: CUTI 2026
+    # Sheet 1: CUTI <tahun berjalan>
     cuti_headers = [
         "NO", "MASEHI", "HARI", "NAMA", "KEPERLUAN", "NO SURAT",
         "JABATAN", "SEKSI", "SHIF", "KABID/KASI", "NIP",
-        "STATUS", "TGL_SUBMIT", "TAHUN",
+        "STATUS", "TGL_SUBMIT", "TAHUN", "ID",
     ]
 
-    if "CUTI 2026" not in existing:
-        ws = spreadsheet.add_worksheet("CUTI 2026", rows=1000, cols=14)
+    if SHEET_CUTI not in existing:
+        ws = spreadsheet.add_worksheet(SHEET_CUTI, rows=1000, cols=len(cuti_headers))
         for col, header in enumerate(cuti_headers, 1):
             ws.update_cell(1, col, header)
-        print("Created sheet: CUTI 2026")
+        print(f"Created sheet: {SHEET_CUTI}")
     else:
-        print("Sheet 'CUTI 2026' already exists — skipping")
+        print(f"Sheet '{SHEET_CUTI}' already exists — skipping")
 
     # Sheet 2: DATA_KARYAWAN
     karyawan_headers = [

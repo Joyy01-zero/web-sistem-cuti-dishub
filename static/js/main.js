@@ -1,3 +1,11 @@
+// Confirmation dialogs via data-confirm attribute (pengganti onclick inline)
+document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-confirm]');
+    if (el && !window.confirm(el.dataset.confirm)) {
+        e.preventDefault();
+    }
+});
+
 // Auto-dismiss flash messages after 5 seconds
 document.addEventListener('DOMContentLoaded', function () {
     const alerts = document.querySelectorAll('.flash-message');

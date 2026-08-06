@@ -342,5 +342,40 @@ Test berikut sudah dijalankan otomatis dan hasilnya valid:
 
 ---
 
+## 13. Batch 5 — ID Pengajuan, CSP Nonce, Shared Lockout
+
+### A. Migrasi kolom ID (wajib sebelum deploy kode Batch 5)
+
+1. Jalankan `python migrate_add_id.py`
+2. ✅ Harap: header "ID" muncul di sheet CUTI, semua baris lama terisi ID, output menyebut jumlah baris
+3. Jalankan lagi → ✅ Harap: "0 baris ditulis" (idempoten)
+
+### B. URL admin berbasis ID
+
+1. Login admin → buka Dashboard
+2. ✅ Harap: link "Detail" berbentuk `/admin/detail/<token>` (bukan `/admin/detail/<angka>`)
+3. Buka detail → setujui/tolak → ✅ status berubah pada pengajuan yang benar
+4. Buka URL lama `/admin/detail/5` → ✅ Harap: 404
+5. Buka `/admin/detail/sembarang-nilai-palsu` → ✅ Harap: 404
+
+### C. CSP tanpa unsafe-inline
+
+1. Buka DevTools → Console di semua halaman (form, cek status, login, dashboard, detail, histori)
+2. ✅ Harap: tidak ada error "Content Security Policy"
+3. Cek header: `curl -sI http://127.0.0.1:5000/ | grep -i content-security`
+4. ✅ Harap: ada `script-src 'self' 'nonce-...'`, TIDAK ada `unsafe-inline`
+5. Refresh dua kali → nonce harus berbeda
+6. Validasi NIP (blur di field NIP), dark mode, tombol Setujui/Tolak (confirm dialog) → ✅ semua masih jalan
+
+### D. Shared login lockout
+
+1. 5x login dengan password salah → ✅ Harap: "Akun terkunci. Coba lagi dalam ... detik."
+2. Restart app (`Ctrl+C` lalu `python app.py`)
+3. Coba login lagi → ✅ Harap: masih terkunci (state tersimpan di `instance/auth_state.json`)
+4. Login sukses setelah masa kunci habis → counter ter-reset
+5. Hapus file `instance/auth_state.json` untuk membuka kunci manual (keadaan darurat)
+
+---
+
 *File ini berisi test yang hanya bisa dilakukan secara manual di browser.*
 *Test via curl/terminal dijalankan otomatis oleh AI agent.*

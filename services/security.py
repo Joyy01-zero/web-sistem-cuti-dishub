@@ -138,11 +138,13 @@ def add_security_headers(response):
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    # CSP: allow inline scripts (needed for our JS) + Google Fonts
+    # Nonce dibuat saat render template (lihat inject_globals di app.py);
+    # untuk respons tanpa render (redirect/file) generate nonce sisa.
+    nonce = g.get("csp_nonce") or secrets.token_urlsafe(16)
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline'; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        f"script-src 'self' 'nonce-{nonce}'; "
+        "style-src 'self' https://fonts.googleapis.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "img-src 'self' data:; "
         "connect-src 'self'"

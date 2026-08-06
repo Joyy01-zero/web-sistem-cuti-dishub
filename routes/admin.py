@@ -16,18 +16,27 @@ from services.auth_service import verify_password, check_lockout, record_failed_
 from services.sheets_service import (
     get_all_records,
     get_pengajuan_by_status,
+    get_pengajuan_by_id,
     get_karyawan_by_nip,
     get_all_seksi,
     get_stats,
-    update_row_status,
+    update_status_by_id,
 )
 from services.kuota_service import get_tahun_sekarang
 from services.surat_service import generate_surat
 from services.security import validate_csrf, get_real_ip, safe_error_message
 from datetime import datetime
 import io
+import re
 
 admin_bp = Blueprint("admin", __name__, template_folder="../templates/admin")
+
+_ID_PATTERN = re.compile(r"[A-Za-z0-9_-]{6,64}")
+
+
+def _require_valid_id(pengajuan_id):
+    if not _ID_PATTERN.fullmatch(pengajuan_id):
+        abort(404)
 
 
 @admin_bp.route("/login", methods=["GET", "POST"])
@@ -107,40 +116,32 @@ def dashboard():
     )
 
 
-@admin_bp.route("/detail/<int:row_num>")
+@admin_bp.route("/detail/<string:pengajuan_id>")
 @login_required
-def detail(row_num):
-    if row_num < 2:
-        abort(404)
+def detail(pengajuan_id):
+    _require_valid_id(pengajuan_id)
 
     try:
-        records = get_all_records(SHEET_CUTI)
-        idx = row_num - 2  # 0-indexed in records list (row 1 = header, row 2 = first record)
-        if idx < 0 or idx >= len(records):
-            flash("Data tidak ditemukan.", "danger")
-            return redirect(url_for("admin.dashboard"))
-        data = records[idx]
+        data = get_pengajuan_by_id(pengajuan_id)
     except Exception:
+        data = None
+    if not data:
         flash("Data tidak ditemukan.", "danger")
         return redirect(url_for("admin.dashboard"))
 
-    return render_template("detail_pengajuan.html", data=data, row_num=row_num)
+    return render_template("detail_pengajuan.html", data=data, pengajuan_id=pengajuan_id)
 
 
-@admin_bp.route("/generate-surat/<int:row_num>")
+@admin_bp.route("/generate-surat/<string:pengajuan_id>")
 @login_required
-def generate_surat_route(row_num):
-    if row_num < 2:
-        abort(404)
+def generate_surat_route(pengajuan_id):
+    _require_valid_id(pengajuan_id)
 
     try:
-        records = get_all_records(SHEET_CUTI)
-        idx = row_num - 2
-        if idx < 0 or idx >= len(records):
-            flash("Data tidak ditemukan.", "danger")
-            return redirect(url_for("admin.dashboard"))
-        data = records[idx]
+        data = get_pengajuan_by_id(pengajuan_id)
     except Exception:
+        data = None
+    if not data:
         flash("Data tidak ditemukan.", "danger")
         return redirect(url_for("admin.dashboard"))
 
@@ -159,13 +160,11 @@ def generate_surat_route(row_num):
         return redirect(url_for("admin.dashboard"))
 
 
-@admin_bp.route("/update-status/<int:row_num>", methods=["POST"])
+@admin_bp.route("/update-status/<string:pengajuan_id>", methods=["POST"])
 @login_required
-def update_status(row_num):
+def update_status(pengajuan_id):
     validate_csrf()  # CSRF check
-
-    if row_num < 2:
-        abort(404)
+    _require_valid_id(pengajuan_id)
 
     status = request.form.get("status", "").strip()
     no_surat = request.form.get("no_surat", "").strip()
@@ -176,15 +175,15 @@ def update_status(row_num):
 
     if status == "Disetujui" and not no_surat:
         flash("Nomor Surat wajib diisi untuk status Disetujui.", "danger")
-        return redirect(url_for("admin.detail", row_num=row_num))
+        return redirect(url_for("admin.detail", pengajuan_id=pengajuan_id))
 
     # Validate no_surat format (alphanumeric + / only)
     if no_surat and not all(c.isalnum() or c in "/- .," for c in no_surat):
         flash("Format Nomor Surat tidak valid.", "danger")
-        return redirect(url_for("admin.detail", row_num=row_num))
+        return redirect(url_for("admin.detail", pengajuan_id=pengajuan_id))
 
     try:
-        update_row_status(SHEET_CUTI, row_num, status, no_surat or None)
+        update_status_by_id(SHEET_CUTI, pengajuan_id, status, no_surat or None)
         flash(f"Status berhasil diubah ke {status}.", "success")
     except Exception as e:
         flash(safe_error_message(e, "update status"), "danger")

@@ -2,6 +2,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 import json
 import os
+import secrets
 import time
 from config.settings import SHEET_CUTI, SHEET_KARYAWAN
 
@@ -137,10 +138,7 @@ def get_pengajuan_by_nip(nip):
 def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=None):
     records = get_all_records(SHEET_CUTI)
     result = []
-    for i, r in enumerate(records):
-        # Row number = i + 2 (1-indexed, +1 for header)
-        r["_row"] = i + 2
-
+    for r in records:
         if status_filter and status_filter != "Semua":
             if r.get("STATUS", "").strip() != status_filter:
                 continue
@@ -173,13 +171,46 @@ def update_cell(sheet_name, row_num, col_name, value):
     invalidate_cache(sheet_name)
 
 
-def update_row_status(sheet_name, row_num, status, no_surat=None):
+def generate_pengajuan_id():
+    return secrets.token_urlsafe(9)
+
+
+def get_pengajuan_by_id(pengajuan_id):
+    pengajuan_id = str(pengajuan_id).strip()
+    for r in get_all_records(SHEET_CUTI):
+        if str(r.get("ID", "")).strip() == pengajuan_id:
+            return dict(r)  # copy to avoid exposing cached dict
+    return None
+
+
+def update_status_by_id(sheet_name, pengajuan_id, status, no_surat=None):
+    """Update STATUS (and optionally NO SURAT) of the record with this ID.
+
+    The sheet row is resolved at WRITE time by scanning the ID column, so a
+    shifted/edited sheet can never cause a write to the wrong record.
+    """
+    pengajuan_id = str(pengajuan_id).strip()
+    invalidate_cache(sheet_name)
+    sheet = get_sheet(sheet_name)
+    headers = [h.strip() for h in sheet.row_values(1)]
+    if "ID" not in headers:
+        raise ValueError("Kolom 'ID' tidak ditemukan. Jalankan migrate_add_id.py dulu.")
+    id_col = headers.index("ID") + 1
+
+    id_values = sheet.col_values(id_col)  # index 0 = header
+    try:
+        row_num = id_values.index(pengajuan_id) + 1
+    except ValueError:
+        raise ValueError(f"Pengajuan dengan ID '{pengajuan_id}' tidak ditemukan.")
+
     update_cell(sheet_name, row_num, "STATUS", status)
     if no_surat is not None and str(no_surat).strip():
         update_cell(sheet_name, row_num, "NO SURAT", str(no_surat).strip())
 
 
-def get_all_seksi(sheet_name="CUTI 2026"):
+def get_all_seksi(sheet_name=None):
+    if sheet_name is None:
+        sheet_name = SHEET_CUTI
     records = get_all_records(sheet_name)
     return sorted(set(r.get("SEKSI", "").strip() for r in records if r.get("SEKSI", "").strip()))
 

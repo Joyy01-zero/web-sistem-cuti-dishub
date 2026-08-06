@@ -9,6 +9,9 @@ sistem-cuti-dishub-*.json
 # Template surat (contains real employee data)
 template_surat/
 
+# Flask instance dir (shared lockout state, local runtime data)
+instance/
+
 # Python
 venv/
 __pycache__/

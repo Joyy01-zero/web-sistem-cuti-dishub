@@ -1,9 +1,10 @@
-from flask import Flask
+from flask import Flask, g
 from flask_login import LoginManager
 from config.settings import SECRET_KEY, SESSION_TIMEOUT_MINUTES, ADMIN_USERNAME
 from datetime import timedelta
 from models import AdminUser
 import os
+import secrets
 
 
 def create_app():
@@ -28,10 +29,12 @@ def create_app():
     from services.security import add_security_headers, generate_csrf_token
     app.after_request(add_security_headers)
 
-    # Inject CSRF token into all templates
+    # Inject CSRF token + per-request CSP nonce into all templates
     @app.context_processor
-    def inject_csrf():
-        return dict(csrf_token=generate_csrf_token)
+    def inject_globals():
+        def csp_nonce():
+            return g.setdefault("csp_nonce", secrets.token_urlsafe(16))
+        return dict(csrf_token=generate_csrf_token, csp_nonce=csp_nonce)
 
     # Login manager
     login_manager = LoginManager()

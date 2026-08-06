@@ -106,10 +106,12 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if p.get('ID') %}
                         <div class="flex gap-1">
-                            <a href="{{ url_for('admin.detail', row_num=p._row) }}" class="btn btn-xs btn-ghost text-primary text-[12px]">Detail</a>
-                            <a href="{{ url_for('admin.generate_surat_route', row_num=p._row) }}" class="btn btn-xs btn-ghost text-base-content/50 text-[12px]">Surat</a>
+                            <a href="{{ url_for('admin.detail', pengajuan_id=p.get('ID')) }}" class="btn btn-xs btn-ghost text-primary text-[12px]">Detail</a>
+                            <a href="{{ url_for('admin.generate_surat_route', pengajuan_id=p.get('ID')) }}" class="btn btn-xs btn-ghost text-base-content/50 text-[12px]">Surat</a>
                         </div>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

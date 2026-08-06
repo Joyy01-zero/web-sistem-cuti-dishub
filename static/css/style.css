@@ -190,3 +190,6 @@ html {
     border-color: #1e3a5f !important;
     color: #93c5fd !important;
 }
+
+/* Logout form inline di nav (pengganti style="display:inline" — CSP style-src) */
+.inline-form { display: inline; }
