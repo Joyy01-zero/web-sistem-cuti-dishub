@@ -1,10 +1,12 @@
-from flask import Flask, g
-from flask_login import LoginManager
-from config.settings import SECRET_KEY, SESSION_TIMEOUT_MINUTES, ADMIN_USERNAME
-from datetime import timedelta
-from models import AdminUser
 import os
 import secrets
+from datetime import timedelta
+
+from flask import Flask, g
+from flask_login import LoginManager
+
+from config.settings import ADMIN_USERNAME, SECRET_KEY, SESSION_TIMEOUT_MINUTES
+from models import AdminUser
 
 
 def create_app():
@@ -50,8 +52,8 @@ def create_app():
         return None
 
     # Register blueprints — import here to avoid circular import
-    from routes.public import public_bp
     from routes.admin import admin_bp
+    from routes.public import public_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(admin_bp, url_prefix="/admin")

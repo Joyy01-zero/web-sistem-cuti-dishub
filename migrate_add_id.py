@@ -8,16 +8,13 @@ Idempotent — safe to run multiple times:
 Safe to run against the OLD codebase before deploying the new code.
 Requires: .env with GOOGLE_CREDENTIALS_JSON and SPREADSHEET_ID set.
 """
+import os
 import secrets
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from gspread.utils import rowcol_to_a1
+
 from config.settings import SHEET_CUTI
 from services.sheets_service import get_sheets_client, invalidate_cache
-import os
 
 SPREADSHEET_ID = os.environ["SPREADSHEET_ID"]
 

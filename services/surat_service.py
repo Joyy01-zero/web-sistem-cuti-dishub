@@ -1,8 +1,9 @@
-from docx import Document
-from config.constants import BULAN_NAMA
 import io
 import os
-import copy
+
+from docx import Document
+
+from config.constants import BULAN_NAMA
 
 TEMPLATE_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
@@ -37,7 +38,6 @@ def generate_surat(data: dict) -> bytes:
     doc = Document(TEMPLATE_PATH)
 
     nama = data.get("NAMA", "")
-    nip = data.get("NIP", "")
     jabatan = data.get("JABATAN", "")
     seksi = data.get("SEKSI", "")
     shif = data.get("SHIF", "")

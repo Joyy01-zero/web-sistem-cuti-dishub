@@ -1,33 +1,33 @@
-from config.settings import SHEET_CUTI, KUOTA_TAHUNAN, ADMIN_USERNAME
+import io
+import re
+
 from flask import (
     Blueprint,
+    abort,
+    flash,
+    redirect,
     render_template,
     request,
-    redirect,
-    url_for,
-    flash,
-    session,
     send_file,
-    abort,
+    session,
+    url_for,
 )
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import current_user, login_required, login_user, logout_user
+
+from config.settings import ADMIN_USERNAME, KUOTA_TAHUNAN, SHEET_CUTI
 from models import AdminUser
-from services.auth_service import verify_password, check_lockout, record_failed_attempt, clear_attempts
+from services.auth_service import check_lockout, clear_attempts, record_failed_attempt, verify_password
+from services.kuota_service import get_tahun_sekarang
+from services.security import get_real_ip, safe_error_message, validate_csrf
 from services.sheets_service import (
     get_all_records,
-    get_pengajuan_by_status,
-    get_pengajuan_by_id,
-    get_karyawan_by_nip,
     get_all_seksi,
+    get_pengajuan_by_id,
+    get_pengajuan_by_status,
     get_stats,
     update_status_by_id,
 )
-from services.kuota_service import get_tahun_sekarang
 from services.surat_service import generate_surat
-from services.security import validate_csrf, get_real_ip, safe_error_message
-from datetime import datetime
-import io
-import re
 
 admin_bp = Blueprint("admin", __name__, template_folder="../templates/admin")
 

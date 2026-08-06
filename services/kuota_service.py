@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from config.settings import KUOTA_TAHUNAN, SHEET_CUTI
 from services.sheets_service import get_all_records
-from datetime import datetime
 
 
 def hitung_kuota_terpakai(nip: str, tahun: int) -> int:

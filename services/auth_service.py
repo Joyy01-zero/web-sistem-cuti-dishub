@@ -1,13 +1,13 @@
-import bcrypt
 import json
 import os
 import tempfile
 import time
 
+import bcrypt
 from filelock import FileLock
 from flask import current_app
 
-from config.settings import ADMIN_PASSWORD_HASH, MAX_LOGIN_ATTEMPTS, LOGIN_LOCKOUT_MINUTES
+from config.settings import ADMIN_PASSWORD_HASH, LOGIN_LOCKOUT_MINUTES, MAX_LOGIN_ATTEMPTS
 
 
 def verify_password(password: str) -> bool:

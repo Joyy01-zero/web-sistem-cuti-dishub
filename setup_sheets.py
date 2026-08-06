@@ -3,7 +3,9 @@ Run once to create the required Google Sheets structure.
 Requires: .env with GOOGLE_CREDENTIALS_JSON and SPREADSHEET_ID set.
 """
 import os
+
 from dotenv import load_dotenv
+
 from config.settings import SHEET_CUTI
 from services.sheets_service import get_sheets_client
 
@@ -48,7 +50,10 @@ def setup():
         # Sample data
         sample = [
             ["19850115 201001 1 001", "Budi Santoso", "1985-01-15", "Staff", "Teknik", "Pagi", "Ahmad Fauzi", "TRUE"],
-            ["19900320 201501 2 002", "Siti Rahayu", "1990-03-20", "Staff", "Operasional", "Siang", "Dewi Lestari", "TRUE"],
+            [
+                "19900320 201501 2 002", "Siti Rahayu", "1990-03-20", "Staff", "Operasional",
+                "Siang", "Dewi Lestari", "TRUE",
+            ],
         ]
         for row in sample:
             ws.append_row(row)

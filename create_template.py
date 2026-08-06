@@ -1,7 +1,7 @@
 """Run once to generate template_cuti_pkwt.docx with placeholders."""
 from docx import Document
-from docx.shared import Pt, Cm
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Cm, Pt
 
 doc = Document()
 

@@ -1,9 +1,11 @@
-import gspread
-from google.oauth2.service_account import Credentials
 import json
 import os
 import secrets
 import time
+
+import gspread
+from google.oauth2.service_account import Credentials
+
 from config.settings import SHEET_CUTI, SHEET_KARYAWAN
 
 
@@ -87,7 +89,8 @@ def _get_cached_data(sheet_name):
             headers = []
             for h in raw_headers:
                 h = h.strip()
-                if not h: continue
+                if not h:
+                    continue
                 if h in seen:
                     seen[h] += 1
                     headers.append(f"{h}_{seen[h]}")

@@ -1,15 +1,15 @@
 """
 Security utilities: CSRF, rate limiting, security headers, safe error handling.
 """
-import hashlib
 import hmac
-import os
-import time
 import secrets
 import threading
+import time
 from functools import wraps
-from flask import request, session, abort, g
 
+from flask import abort, g, request, session
+
+from config.settings import TRUSTED_PROXIES
 
 # ============================================================
 # CSRF Protection
@@ -116,9 +116,6 @@ def rate_limit(max_requests, window_seconds, key_func=None, methods=None):
 # ============================================================
 # IP Address (handle reverse proxy)
 # ============================================================
-
-from config.settings import TRUSTED_PROXIES
-
 
 def get_real_ip():
     """Get real client IP. Only trust X-Forwarded-For from known proxies."""
