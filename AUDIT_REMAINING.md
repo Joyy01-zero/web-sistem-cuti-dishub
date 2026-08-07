@@ -1,9 +1,10 @@
 # Audit Status — Sistem Cuti Dishub
 
-> **Total temuan:** 46
-> **Sudah difix:** 39 (85%)
+> **Total temuan:** 46 (+ 3 dari cloud scan)
+> **Sudah difix:** 39 (85% dari 46)
 > **Sisa terkonfirmasi:** 2 (keduanya LOW severity, sengaja diskip — lihat tabel bawah)
-> **Terakhir update:** 6 Agustus 2026
+> **Diketahui dari cloud scan:** 3 — 1 sudah difix (SEC-9), 2 sisanya (SEC-8, duplikat) belum difix
+> **Terakhir update:** 7 Agustus 2026
 >
 > Catatan: angka sisa kini disesuaikan dengan daftar riil di tabel (versi sebelumnya menulis 10 namun hanya mencantumkan 5 entri).
 
@@ -75,6 +76,22 @@ Bonus yang ikut difix di Batch 5 (di luar daftar audit):
 |---|-----|----------|----------|--------|--------|
 | 1 | PERF-5 | LOW | LOW | hitung_kuota_terpakai linear scan | Sudah di-cache. Impact negligible. |
 | 2 | COMP-5 | LOW | LOW | JS async/await tanpa transpilation | Target audience pakai modern browser. IE11 not required. |
+
+---
+
+## Hasil Cloud Scan (3 temuan — 1 difix, 2 belum)
+
+Sumber: project/file cloud scan terhadap `routes/`, `services/`, `app.py` (7 Agustus 2026). Temuan ini tidak terdeteksi L3 review karena berada di logika lama yang tidak termasuk diff commit terbaru.
+
+| # | ID | Severity | CWE | Lokasi | Status | Temuan |
+|---|-----|----------|-----|--------|--------|--------|
+| 1 | SEC-8 | MEDIUM | CWE-367 (TOCTOU), OWASP A08:2021 | routes/public.py:72, services/kuota_service.py:14 | Belum difix | Kuota cuti bisa dilewati: cek kuota hanya menghitung pengajuan berstatus "Disetujui", tidak menghitung "Menunggu ACC". Karyawan bisa submit banyak pengajuan sekaligus (semua lolos cek), dan jika semua disetujui admin, kuota terlampaui. |
+| 2 | SEC-8 | MEDIUM | CWE-367 (TOCTOU) | (sama dengan #1) | Belum difix | Duplikat temuan #1 — root cause dan data flow sama, dilaporkan sebagai varian terpisah oleh scanner. |
+| 3 | SEC-9 | LOW | CWE-203, OWASP A01:2021 | routes/public.py:124 | **Difix 7 Agu 2026** | Enumerasi NIP: `/api/karyawan/validate/<nip>` mengembalikan HTTP 200 untuk NIP valid dan 404 untuk invalid, sehingga NIP valid bisa dibedakan/dienumerasi (~43.000 per hari meski ada rate limit 30/menit). 8 digit pertama NIP meng-encode tanggal lahir, memperbesar dampak kebocoran. |
+
+Rencana remediasi (jika nanti difix):
+- **SEC-8 (#1/#2):** ikutkan status `"Menunggu ACC"` dalam `hitung_kuota_terpakai()` (`row.get("STATUS", "").strip() in ("Disetujui", "Menunggu ACC")`), atau cek ulang sisa kuota saat admin menyetujui pengajuan.
+- ~~**SEC-9 (#3):**~~ sudah difix — endpoint kini selalu mengembalikan HTTP 200; valid/tidak hanya lewat field `valid` di body JSON. Terverifikasi live: NIP valid, invalid, dan format salah semuanya dijawab 200.
 
 ---
 

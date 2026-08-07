@@ -124,13 +124,13 @@ def form_cuti():
 @public_bp.route("/api/karyawan/validate/<nip>")
 @rate_limit(max_requests=30, window_seconds=60)
 def api_validate_nip(nip):
-    """Validate NIP exists. Returns only validation result, no personal data."""
+    """Validate NIP exists. Always HTTP 200 so responses can't be used to enumerate NIPs."""
     nip_clean = nip.strip()
     if not nip_clean.isdigit() or len(nip_clean) > 20:
-        return jsonify({"valid": False, "message": "Format NIP tidak valid."}), 400
+        return jsonify({"valid": False, "message": "NIP tidak terdaftar."})
     karyawan = get_karyawan_by_nip(nip_clean)
     if not karyawan:
-        return jsonify({"valid": False, "message": "NIP tidak terdaftar."}), 404
+        return jsonify({"valid": False, "message": "NIP tidak terdaftar."})
     return jsonify({"valid": True, "message": "NIP terdaftar."})
 
 
