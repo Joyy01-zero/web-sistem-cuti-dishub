@@ -61,7 +61,7 @@ html {
 .input {
     background: var(--neo-inset-bg) !important;
     box-shadow:
-        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset -3px -3px 8px var(--neo-light),
         inset 3px 3px 8px var(--neo-dark);
     border: none !important;
 }
@@ -73,13 +73,13 @@ html {
     background-size: 4px 4px, 4px 4px;
     background-repeat: no-repeat;
     box-shadow:
-        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset -3px -3px 8px var(--neo-light),
         inset 3px 3px 8px var(--neo-dark);
     border: none !important;
 }
 .input:focus, .select:focus {
     box-shadow:
-        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset -3px -3px 8px var(--neo-light),
         inset 3px 3px 8px var(--neo-dark),
         0 0 0 3px oklch(var(--p) / 0.15) !important;
     outline: none;
@@ -96,7 +96,7 @@ html {
 .btn-primary, .btn.bg-primary {
     box-shadow:
         4px 4px 10px var(--neo-dark),
-        -4px -4px 10px rgba(255, 255, 255, 0.5);
+        -4px -4px 10px var(--neo-light);
 }
 .btn-primary:active, .btn.bg-primary:active {
     box-shadow:
@@ -163,7 +163,7 @@ html {
     border-radius: 0.875rem;
     background: var(--neo-inset-bg) !important;
     box-shadow:
-        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset -3px -3px 8px var(--neo-light),
         inset 3px 3px 8px var(--neo-dark);
     padding: 0.625rem 0.875rem;
     border: none;
@@ -262,8 +262,8 @@ html {
 
 /* === Dark mode — neumorphic inverted shadows === */
 [data-theme="dishub-dark"] {
-    --neo-light: rgba(255, 255, 255, 0.04);
-    --neo-dark: rgba(0, 0, 0, 0.55);
+    --neo-light: rgba(255, 255, 255, 0.07);
+    --neo-dark: rgba(0, 0, 0, 0.6);
     --neo-inset-bg: #232933;
 }
 [data-theme="dishub-dark"] .input,
