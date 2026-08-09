@@ -1,11 +1,17 @@
-/* === Sistem Cuti Dishub — Hallmark Design Tokens === */
+/* === Sistem Cuti Dishub — Neumorphism (UI UX Pro Max) === */
+
+/* Tokens */
+:root {
+    --neo-light: rgba(255, 255, 255, 0.65);
+    --neo-dark: rgba(163, 177, 198, 0.55);
+    --neo-inset-bg: #d5dae2;
+    --neo-radius: 1rem;
+}
 
 /* Base */
 body {
     font-family: 'Geist', system-ui, -apple-system, sans-serif;
-    color: #1a1a2e;
     color: oklch(var(--bc));
-    background-color: #f5f6f9;
     background-color: oklch(var(--b1));
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -14,24 +20,84 @@ html {
     overflow-x: hidden;
 }
 
-/* Display heading */
-.heading-display {
-    font-family: 'DM Serif Display', Georgia, serif;
-    font-weight: 400;
-    font-style: normal;
-    line-height: 1.15;
-    color: oklch(var(--bc));
-    overflow-wrap: anywhere;
-}
-
-/* Stat card */
-.stat-card-hover {
-    transition: box-shadow 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+/* === Extruded (convex) — cards, stats, buttons === */
+.neo-card {
+    border-radius: var(--neo-radius);
+    background: oklch(var(--b1));
+    box-shadow:
+        -6px -6px 14px var(--neo-light),
+        6px 6px 14px var(--neo-dark);
+    transition: box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1), transform 0.15s ease;
 }
 @media (hover: hover) and (pointer: fine) {
-    .stat-card-hover:hover {
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+    .neo-card:hover {
+        box-shadow:
+            -8px -8px 18px var(--neo-light),
+            8px 8px 18px var(--neo-dark);
     }
+}
+.neo-card:active {
+    transform: scale(0.99);
+}
+
+/* === Inset (concave) — inputs, search fields === */
+.neo-inset {
+    border-radius: calc(var(--neo-radius) - 2px);
+    background: var(--neo-inset-bg) !important;
+    box-shadow:
+        inset -4px -4px 10px rgba(255, 255, 255, 0.55),
+        inset 4px 4px 10px var(--neo-dark);
+    border: none !important;
+}
+.neo-inset:focus {
+    box-shadow:
+        inset -4px -4px 10px rgba(255, 255, 255, 0.55),
+        inset 4px 4px 10px var(--neo-dark),
+        0 0 0 3px oklch(var(--p) / 0.15) !important;
+    outline: none;
+}
+
+/* Inputs & selects — inset */
+.input, .select {
+    background: var(--neo-inset-bg) !important;
+    box-shadow:
+        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset 3px 3px 8px var(--neo-dark);
+    border: none !important;
+}
+.input:focus, .select:focus {
+    box-shadow:
+        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset 3px 3px 8px var(--neo-dark),
+        0 0 0 3px oklch(var(--p) / 0.15) !important;
+    outline: none;
+}
+
+/* Buttons — press animation */
+.btn {
+    white-space: nowrap;
+    transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn:active {
+    transform: scale(0.97);
+}
+.btn-primary, .btn.bg-primary {
+    box-shadow:
+        4px 4px 10px var(--neo-dark),
+        -4px -4px 10px rgba(255, 255, 255, 0.5);
+}
+.btn-primary:active, .btn.bg-primary:active {
+    box-shadow:
+        inset 3px 3px 8px rgba(0, 0, 0, 0.25),
+        inset -3px -3px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* Nav — extruded bar */
+.nav-bar {
+    background: oklch(var(--b1));
+    box-shadow:
+        0 4px 12px var(--neo-dark);
+    border-bottom: none;
 }
 
 /* Table */
@@ -44,6 +110,9 @@ html {
     letter-spacing: 0.06em;
     white-space: nowrap;
 }
+.table-zebra tbody tr:nth-child(2n) {
+    background-color: oklch(var(--b2) / 0.5);
+}
 
 /* Badge */
 .badge {
@@ -52,32 +121,40 @@ html {
     letter-spacing: 0.02em;
     border: none;
     white-space: nowrap;
+    box-shadow:
+        inset -2px -2px 6px rgba(255, 255, 255, 0.4),
+        inset 2px 2px 6px rgba(0, 0, 0, 0.05);
+}
+.badge-warning {
+    background-color: #fef3c7 !important;
+    color: #92400e !important;
+}
+.badge-success {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+}
+.badge-error {
+    background-color: #fee2e2 !important;
+    color: #991b1b !important;
+}
+.badge-info {
+    background-color: #dbeafe !important;
+    color: #1e3a5f !important;
+}
+.badge-ghost {
+    background-color: oklch(var(--b3)) !important;
+    color: oklch(var(--bc) / 0.7) !important;
 }
 
-/* Input focus */
-.input:focus,
-.select:focus {
-    border-color: oklch(var(--p)) !important;
-    box-shadow: 0 0 0 2px oklch(var(--p) / 0.08) !important;
-    outline: none;
-}
-
-/* Touch targets — min 44px on coarse pointer */
-@media (pointer: coarse) {
-    .btn, .input, .select, a[class*="px-3"] {
-        min-height: 44px;
-    }
-    .input, .select {
-        font-size: 16px; /* prevents iOS zoom */
-    }
-}
-
-/* Info field */
+/* Info field — inset */
 .info-field {
-    background-color: oklch(var(--b2));
-    border: 1px solid oklch(var(--b3));
-    border-radius: 0.5rem;
+    border-radius: 0.875rem;
+    background: var(--neo-inset-bg) !important;
+    box-shadow:
+        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset 3px 3px 8px var(--neo-dark);
     padding: 0.625rem 0.875rem;
+    border: none;
 }
 .info-field-label {
     font-size: 0.6rem;
@@ -117,10 +194,26 @@ html {
     gap: 0.75rem;
     margin-bottom: 1rem;
 }
+.section-header-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    background: oklch(var(--b1));
+    color: oklch(var(--p));
+    box-shadow:
+        -4px -4px 10px var(--neo-light),
+        4px 4px 10px var(--neo-dark);
+}
 
-/* Buttons — no wrap */
-.btn {
-    white-space: nowrap;
+/* Dividers — inset hairline instead of border */
+.divider-soft {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--neo-dark), transparent);
+    border: none;
 }
 
 /* Table responsive */
@@ -131,23 +224,41 @@ html {
     padding-inline: 1rem;
 }
 
-/* Mobile-specific */
+/* Touch targets */
+@media (pointer: coarse) {
+    .btn, .input, .select, a[class*="px-3"] {
+        min-height: 44px;
+    }
+    .input, .select {
+        font-size: 16px;
+    }
+}
+
+/* Mobile */
 @media (max-width: 640px) {
     .table-sm td, .table-sm th {
         padding: 0.375rem 0.5rem;
         font-size: 0.75rem;
     }
-    /* Stack info fields tighter on mobile */
     .info-field {
         padding: 0.5rem 0.75rem;
     }
-    /* Form inputs full width, no gap issues */
     .input, .select {
         width: 100%;
     }
 }
 
-/* Dark mode badge overrides */
+/* === Dark mode — neumorphic inverted shadows === */
+[data-theme="dishub-dark"] {
+    --neo-light: rgba(255, 255, 255, 0.04);
+    --neo-dark: rgba(0, 0, 0, 0.55);
+    --neo-inset-bg: #232933;
+}
+[data-theme="dishub-dark"] .input,
+[data-theme="dishub-dark"] .select,
+[data-theme="dishub-dark"] .info-field {
+    background: #232933 !important;
+}
 [data-theme="dishub-dark"] .badge-warning {
     background-color: #422006 !important;
     color: #fbbf24 !important;
@@ -165,31 +276,6 @@ html {
     color: #93c5fd !important;
 }
 [data-theme="dishub-dark"] .badge-ghost {
-    background-color: oklch(var(--b3)) !important;
-    color: oklch(var(--bc) / 0.7) !important;
+    background-color: #2c333f !important;
+    color: #aeb6c4 !important;
 }
-
-/* Dark mode flash message overrides */
-[data-theme="dishub-dark"] .bg-green-50 {
-    background-color: #052e16 !important;
-    border-color: #166534 !important;
-    color: #4ade80 !important;
-}
-[data-theme="dishub-dark"] .bg-red-50 {
-    background-color: #450a0a !important;
-    border-color: #7f1d1d !important;
-    color: #fca5a5 !important;
-}
-[data-theme="dishub-dark"] .bg-amber-50 {
-    background-color: #422006 !important;
-    border-color: #78350f !important;
-    color: #fcd34d !important;
-}
-[data-theme="dishub-dark"] .bg-blue-50 {
-    background-color: #172554 !important;
-    border-color: #1e3a5f !important;
-    color: #93c5fd !important;
-}
-
-/* Logout form inline di nav (pengganti style="display:inline" — CSP style-src) */
-.inline-form { display: inline; }

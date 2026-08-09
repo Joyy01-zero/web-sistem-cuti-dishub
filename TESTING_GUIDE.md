@@ -1,8 +1,9 @@
 # Panduan Testing Manual — Sistem Cuti Dishub
 
-> **Untuk:** Yasin (developer/admin)
-> **Terakhir update:** 6 Agustus 2026 (Batch 5)
-> **Server:** http://127.0.0.1:5000 (pastikan `python app.py` sudah jalan)
+> **Untuk:** Yasin (developer/admin) & Teman Penguji  
+> **Terakhir update:** 8 Agustus 2026  
+> **Server:** http://127.0.0.1:5000 (pastikan `python app.py` sudah jalan)  
+> **Panduan Uji Coba Bersama Teman:** Lihat [PANDUAN_TESTING_TEMAN.md](file:///c:/Users/yasin/KKL/Project/sistem-cuti-dishub/PANDUAN_TESTING_TEMAN.md) untuk cara akses via Wi-Fi lokal / online.
 
 ---
 

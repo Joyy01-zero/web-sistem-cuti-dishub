@@ -16,7 +16,7 @@
 <body class="bg-base-100 min-h-screen flex flex-col overflow-x-clip">
 
     <!-- Nav -->
-    <nav class="bg-base-100 border-b border-base-300 sticky top-0 z-50">
+    <nav class="nav-bar bg-base-100 sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <!-- Wordmark -->
             <a href="{{ url_for('public.form_cuti') }}" class="flex items-center gap-2 shrink-0">
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden sm:hidden border-t border-base-300 bg-base-100">
+        <div id="mobile-menu" class="hidden sm:hidden bg-base-100">
             <div class="px-4 py-2 space-y-0.5">
                 <a href="{{ url_for('public.form_cuti') }}"
                    class="block px-3 py-2.5 rounded text-[14px] font-medium transition-colors
@@ -111,7 +111,7 @@
                     Cek Status
                 </a>
                 {% if current_user.is_authenticated %}
-                <div class="border-t border-base-300 my-1.5"></div>
+                <div class="divider-soft my-3"></div>
                 <a href="{{ url_for('admin.dashboard') }}"
                    class="block px-3 py-2.5 rounded text-[14px] font-medium transition-colors
                           {% if request.endpoint == 'admin.dashboard' %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:bg-base-200{% endif %}">
@@ -130,7 +130,7 @@
                     </button>
                 </form>
                 {% else %}
-                <div class="border-t border-base-300 my-1.5"></div>
+                <div class="divider-soft my-3"></div>
                 <a href="{{ url_for('admin.login') }}"
                    class="block px-3 py-2.5 rounded text-[14px] font-semibold text-primary">
                     Login Admin
@@ -178,7 +178,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-base-300 py-4 mt-auto">
+    <footer class="py-4 mt-auto">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center">
             <p class="text-[11px] sm:text-xs text-base-content/50 leading-relaxed">
                 Sub Bagian Umum & Kepegawaian — Dishub Kota Bogor &copy; 2026

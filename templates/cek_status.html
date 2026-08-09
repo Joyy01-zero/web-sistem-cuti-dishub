@@ -7,17 +7,17 @@
     <p class="text-base-content/50 text-[13px] mt-1">Masukkan NIP dan Tanggal Lahir</p>
 </div>
 
-<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
+<div class="neo-card p-4 sm:p-6">
     <form method="POST" action="{{ url_for('public.cek_status') }}">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
                 <label class="block text-[13px] font-medium text-base-content mb-1">NIP <span class="text-error">*</span></label>
-                <input type="text" name="nip" placeholder="Masukkan NIP" required class="input input-bordered w-full text-sm">
+                <input type="text" name="nip" placeholder="Masukkan NIP" required class="input w-full text-sm">
             </div>
             <div>
                 <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Lahir <span class="text-error">*</span></label>
-                <input type="date" name="tgl_lahir" required class="input input-bordered w-full text-sm">
+                <input type="date" name="tgl_lahir" required class="input w-full text-sm">
             </div>
             <div class="sm:flex sm:items-end">
                 <button type="submit" class="btn bg-primary hover:opacity-90 text-primary-content border-none text-sm font-semibold w-full">
@@ -28,7 +28,7 @@
     </form>
 
     {% if submitted %}
-    <div class="border-t border-base-300 my-4"></div>
+    <div class="border-t border-base-content/10 my-4"></div>
 
     <!-- Result header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">

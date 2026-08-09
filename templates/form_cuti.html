@@ -7,7 +7,7 @@
     <p class="text-base-content/50 text-[13px] mt-1">Isi formulir untuk mengajukan cuti</p>
 </div>
 
-<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
+<div class="neo-card p-4 sm:p-6">
     <form method="POST" action="{{ url_for('public.form_cuti') }}" id="formCuti">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
         <!-- Data Pribadi -->
@@ -18,38 +18,38 @@
                     <label class="block text-[13px] font-medium text-base-content mb-1">NIP <span class="text-error">*</span></label>
                     <input type="text" id="nip" name="nip" value="{{ form_data.get('nip', '') }}"
                            placeholder="Masukkan NIP" required autocomplete="username"
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                     <span id="nip-status" class="text-xs mt-0.5 block"></span>
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Nama Lengkap <span class="text-error">*</span></label>
                     <input type="text" id="nama" name="nama" value="{{ form_data.get('nama', '') }}"
-                           placeholder="Nama lengkap" required class="input input-bordered w-full text-sm">
+                           placeholder="Nama lengkap" required class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Lahir <span class="text-error">*</span></label>
                     <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ form_data.get('tgl_lahir', '') }}" required
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Jabatan <span class="text-error">*</span></label>
                     <input type="text" id="jabatan" name="jabatan" value="{{ form_data.get('jabatan', '') }}"
-                           placeholder="Jabatan" required class="input input-bordered w-full text-sm">
+                           placeholder="Jabatan" required class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Bidang/Seksi <span class="text-error">*</span></label>
                     <input type="text" id="seksi" name="seksi" value="{{ form_data.get('seksi', '') }}"
-                           placeholder="Bidang atau seksi" required class="input input-bordered w-full text-sm">
+                           placeholder="Bidang atau seksi" required class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Shif</label>
                     <input type="text" id="shif" name="shif" value="{{ form_data.get('shif', '') }}"
-                           placeholder="Opsional" class="input input-bordered w-full text-sm">
+                           placeholder="Opsional" class="input w-full text-sm">
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-base-300 my-4"></div>
+        <div class="border-t border-base-content/10 my-4"></div>
 
         <!-- Detail Cuti -->
         <div class="mb-5">
@@ -58,16 +58,16 @@
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Mulai <span class="text-error">*</span></label>
                     <input type="date" id="tgl_mulai" name="tgl_mulai" value="{{ form_data.get('tgl_mulai', '') }}" required
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Selesai <span class="text-error">*</span></label>
                     <input type="date" id="tgl_selesai" name="tgl_selesai" value="{{ form_data.get('tgl_selesai', '') }}" required
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Keperluan <span class="text-error">*</span></label>
-                    <select id="keperluan" name="keperluan" required class="select select-bordered w-full text-sm">
+                    <select id="keperluan" name="keperluan" required class="select w-full text-sm">
                         <option value="">-- Pilih --</option>
                         <option value="Keperluan Keluarga" {{ 'selected' if form_data.get('keperluan') == 'Keperluan Keluarga' }}>Keperluan Keluarga</option>
                         <option value="Sakit" {{ 'selected' if form_data.get('keperluan') == 'Sakit' }}>Sakit</option>
@@ -80,13 +80,13 @@
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Kabid/Kasi <span class="text-error">*</span></label>
                     <input type="text" id="kabid_kasi" name="kabid_kasi" value="{{ form_data.get('kabid_kasi', '') }}"
-                           placeholder="Nama atasan" required class="input input-bordered w-full text-sm">
+                           placeholder="Nama atasan" required class="input w-full text-sm">
                 </div>
             </div>
         </div>
 
         <!-- Submit -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-base-300">
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-base-content/10">
             <p class="text-xs text-base-content/50 text-center sm:text-left"><span class="text-error">*</span> Wajib diisi</p>
             <button type="submit" class="btn bg-primary hover:opacity-90 text-primary-content border-none text-sm font-semibold w-full sm:w-auto">
                 Kirim Pengajuan

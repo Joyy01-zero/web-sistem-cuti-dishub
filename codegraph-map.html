@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeGraph KKL — Dependency Map</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; margin: 0; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 16px; margin-bottom: 20px; }
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 16px; text-align: center; }
+  .stat .num { font-size: 22px; font-weight: 700; color: #38bdf8; }
+  .stat .lbl { font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12px; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .mermaid { background: #0f172a; border-radius: 12px; padding: 12px; overflow-x: auto; }
+  code { background: #334155; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>🗺️ Dependency Map — Sistem Cuti Dishub</h1>
+<div class="sub">Generated dari CodeGraph index · 21 files · 226 nodes · 399 edges · auto-sync aktif</div>
+
+<div class="card">
+  <div class="stats">
+    <div class="stat"><div class="num">21</div><div class="lbl">Files</div></div>
+    <div class="stat"><div class="num">70</div><div class="lbl">Imports</div></div>
+    <div class="stat"><div class="num">65</div><div class="lbl">Fungsi</div></div>
+    <div class="stat"><div class="num">11</div><div class="lbl">Routes</div></div>
+    <div class="stat"><div class="num">2</div><div class="lbl">Class</div></div>
+    <div class="stat"><div class="num">399</div><div class="lbl">Edges</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="legend">
+    <span><span class="dot" style="background:#f59e0b"></span> Entry (app.py)</span>
+    <span><span class="dot" style="background:#38bdf8"></span> Routes</span>
+    <span><span class="dot" style="background:#34d399"></span> Services</span>
+    <span><span class="dot" style="background:#a78bfa"></span> Config</span>
+    <span><span class="dot" style="background:#f472b6"></span> Model/Utils</span>
+  </div>
+  <div class="mermaid">
+flowchart LR
+    app["<b>app.py</b><br/><small>entry</small>"]:::entry
+    admin["<b>routes/admin.py</b><br/><small>31 symbols</small>"]:::route
+    public["<b>routes/public.py</b><br/><small>15 symbols</small>"]:::route
+    auth["<b>auth_service.py</b>"]:::svc
+    kuota["<b>kuota_service.py</b>"]:::svc
+    sheets["<b>sheets_service.py</b><br/><small>31 symbols</small>"]:::svc
+    security["<b>security.py</b>"]:::svc
+    surat["<b>surat_service.py</b>"]:::svc
+    settings["<b>config/settings.py</b>"]:::cfg
+    constants["<b>config/constants.py</b>"]:::cfg
+    models["<b>models.py</b>"]:::model
+    setup["<b>setup_sheets.py</b>"]:::util
+    migrate["<b>migrate_add_id.py</b>"]:::util
+    create["<b>create_template.py</b>"]:::util
+    hashgen["<b>generate_hash.py</b>"]:::util
+
+    app --> admin
+    app --> public
+    admin --> auth
+    admin --> kuota
+    admin --> sheets
+    admin --> security
+    admin --> surat
+    admin --> models
+    public --> auth
+    public --> sheets
+    public --> kuota
+    public --> security
+    admin --> settings
+    public --> settings
+    auth --> settings
+    kuota --> settings
+    sheets --> settings
+    surat --> settings
+    sheets --> constants
+    setup --> sheets
+    migrate --> sheets
+    create --> sheets
+
+    classDef entry fill:#78350f,stroke:#f59e0b,color:#fff;
+    classDef route fill:#0c4a6e,stroke:#38bdf8,color:#fff;
+    classDef svc fill:#064e3b,stroke:#34d399,color:#fff;
+    classDef cfg fill:#4c1d95,stroke:#a78bfa,color:#fff;
+    classDef model fill:#831843,stroke:#f472b6,color:#fff;
+    classDef util fill:#1e293b,stroke:#64748b,color:#cbd5e1;
+  </div>
+</div>
+
+<div class="card" style="font-size:13px">
+  <b>💡 Cara baca:</b> panah = "import/depend ke". <b>sheets_service</b> adalah pusatnya — 5 file depend ke situ (kuota, setup_sheets, migrate_add_id, public, admin). Kalau kamu ubah sheets_service, 5 file itu yang harus dicek. Perintah CLI yang kepake: <code>codegraph impact sheets_service</code> · <code>codegraph callers &lt;fungsi&gt;</code> · <code>codegraph explore "alur pengajuan"</code>
+</div>
+</body>
+</html>

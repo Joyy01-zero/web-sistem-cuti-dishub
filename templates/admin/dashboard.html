@@ -9,32 +9,32 @@
 
 <!-- Stats -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-4">
-    <div class="bg-base-100 rounded-card border border-base-300 p-3 sm:p-4 stat-card-hover">
+    <div class="neo-card p-3 sm:p-4 stat-card-hover">
         <div class="text-[11px] sm:text-xs text-base-content/50 font-medium mb-0.5">Menunggu</div>
         <div class="text-xl sm:text-2xl font-semibold text-warning">{{ stats.menunggu }}</div>
     </div>
-    <div class="bg-base-100 rounded-card border border-base-300 p-3 sm:p-4 stat-card-hover">
+    <div class="neo-card p-3 sm:p-4 stat-card-hover">
         <div class="text-[11px] sm:text-xs text-base-content/50 font-medium mb-0.5">Disetujui</div>
         <div class="text-xl sm:text-2xl font-semibold text-success">{{ stats.disetujui }}</div>
     </div>
-    <div class="bg-base-100 rounded-card border border-base-300 p-3 sm:p-4 stat-card-hover">
+    <div class="neo-card p-3 sm:p-4 stat-card-hover">
         <div class="text-[11px] sm:text-xs text-base-content/50 font-medium mb-0.5">Ditolak</div>
         <div class="text-xl sm:text-2xl font-semibold text-error">{{ stats.ditolak }}</div>
     </div>
-    <div class="bg-base-100 rounded-card border border-base-300 p-3 sm:p-4 stat-card-hover">
+    <div class="neo-card p-3 sm:p-4 stat-card-hover">
         <div class="text-[11px] sm:text-xs text-base-content/50 font-medium mb-0.5">Total</div>
         <div class="text-xl sm:text-2xl font-semibold text-primary">{{ stats.total }}</div>
     </div>
 </div>
 
 <!-- Table -->
-<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
+<div class="neo-card p-4 sm:p-6">
     <!-- Filter — stacks on mobile -->
-    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="mb-4 pb-4 border-b border-base-300">
+    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="mb-4 pb-4 border-b border-base-content/10">
         <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 items-end">
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Status</label>
-                <select name="status" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="status" class="select select-sm text-[13px] w-full">
                     <option value="Menunggu ACC">Menunggu ACC</option>
                     <option value="Disetujui" {{ 'selected' if status_filter == 'Disetujui' }}>Disetujui</option>
                     <option value="Ditolak" {{ 'selected' if status_filter == 'Ditolak' }}>Ditolak</option>
@@ -44,7 +44,7 @@
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Bulan</label>
-                <select name="bulan" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="bulan" class="select select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     {% set months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] %}
                     {% for m in months %}
@@ -54,7 +54,7 @@
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Seksi</label>
-                <select name="seksi" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="seksi" class="select select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     {% for s in semua_seksi %}
                     <option value="{{ s }}" {{ 'selected' if seksi_filter == s }}>{{ s }}</option>

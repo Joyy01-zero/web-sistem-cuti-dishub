@@ -12,18 +12,18 @@
             <p class="text-base-content/50 text-[13px] mt-0.5">Dishub Kota Bogor</p>
         </div>
 
-        <div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
+        <div class="neo-card p-4 sm:p-6">
             <form method="POST" action="{{ url_for('admin.login') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div class="mb-3">
                     <label class="block text-[13px] font-medium text-base-content mb-1">Username</label>
                     <input type="text" name="username" placeholder="Username" required autofocus
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                 </div>
                 <div class="mb-4">
                     <label class="block text-[13px] font-medium text-base-content mb-1">Password</label>
                     <input type="password" name="password" placeholder="Password" required
-                           class="input input-bordered w-full text-sm">
+                           class="input w-full text-sm">
                 </div>
                 <button type="submit" class="btn w-full bg-primary hover:opacity-90 text-primary-content border-none text-sm font-semibold">
                     Masuk

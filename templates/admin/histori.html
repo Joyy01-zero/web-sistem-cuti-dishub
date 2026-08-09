@@ -7,18 +7,18 @@
     <p class="text-base-content/50 text-[13px] mt-1">Rekapitulasi data pengajuan cuti</p>
 </div>
 
-<div class="bg-base-100 rounded-card border border-base-300 p-4 sm:p-6">
+<div class="neo-card p-4 sm:p-6">
     <!-- Filter — 2-col grid on mobile, flex on desktop -->
-    <form method="GET" action="{{ url_for('admin.histori') }}" class="mb-4 pb-4 border-b border-base-300">
+    <form method="GET" action="{{ url_for('admin.histori') }}" class="mb-4 pb-4 border-b border-base-content/10">
         <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 items-end">
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Tahun</label>
                 <input type="number" name="tahun" value="{{ tahun_filter }}" min="2024" max="2030"
-                       class="input input-bordered input-sm text-[13px] w-full">
+                       class="input input-sm text-[13px] w-full">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Bulan</label>
-                <select name="bulan" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="bulan" class="select select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     {% set months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'] %}
                     {% for m in months %}
@@ -28,7 +28,7 @@
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Seksi</label>
-                <select name="seksi" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="seksi" class="select select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     {% for s in semua_seksi %}
                     <option value="{{ s }}" {{ 'selected' if seksi_filter == s }}>{{ s }}</option>
@@ -37,7 +37,7 @@
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Status</label>
-                <select name="status" class="select select-bordered select-sm text-[13px] w-full">
+                <select name="status" class="select select-sm text-[13px] w-full">
                     <option value="">Semua</option>
                     <option value="Menunggu ACC" {{ 'selected' if status_filter == 'Menunggu ACC' }}>Menunggu</option>
                     <option value="Disetujui" {{ 'selected' if status_filter == 'Disetujui' }}>Disetujui</option>
