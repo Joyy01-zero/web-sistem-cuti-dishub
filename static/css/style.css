@@ -58,8 +58,20 @@ html {
 }
 
 /* Inputs & selects — inset */
-.input, .select {
+.input {
     background: var(--neo-inset-bg) !important;
+    box-shadow:
+        inset -3px -3px 8px rgba(255, 255, 255, 0.5),
+        inset 3px 3px 8px var(--neo-dark);
+    border: none !important;
+}
+.select {
+    background-color: var(--neo-inset-bg) !important;
+    /* Chevron arrow (DaisyUI) — keep it */
+    background-image: linear-gradient(45deg, #0000 50%, currentColor 0), linear-gradient(135deg, currentColor 50%, #0000 0);
+    background-position: calc(100% - 20px) calc(1px + 50%), calc(100% - 16.1px) calc(1px + 50%);
+    background-size: 4px 4px, 4px 4px;
+    background-repeat: no-repeat;
     box-shadow:
         inset -3px -3px 8px rgba(255, 255, 255, 0.5),
         inset 3px 3px 8px var(--neo-dark);
@@ -255,9 +267,15 @@ html {
     --neo-inset-bg: #232933;
 }
 [data-theme="dishub-dark"] .input,
-[data-theme="dishub-dark"] .select,
 [data-theme="dishub-dark"] .info-field {
     background: #232933 !important;
+}
+[data-theme="dishub-dark"] .select {
+    background-color: #232933 !important;
+    background-image: linear-gradient(45deg, #0000 50%, currentColor 0), linear-gradient(135deg, currentColor 50%, #0000 0);
+    background-position: calc(100% - 20px) calc(1px + 50%), calc(100% - 16.1px) calc(1px + 50%);
+    background-size: 4px 4px, 4px 4px;
+    background-repeat: no-repeat;
 }
 [data-theme="dishub-dark"] .badge-warning {
     background-color: #422006 !important;
