@@ -226,7 +226,8 @@ def histori():
             continue
         if nip not in nama_index:
             nama_index[nip] = r.get("NAMA", "")
-        if str(r.get("TAHUN", "")) == str(tahun) and r.get("STATUS", "").strip() == "Disetujui":
+        if str(r.get("TAHUN", "")) == str(tahun) and r.get("STATUS", "").strip() == "Disetujui" \
+                and r.get("KEPERLUAN", "").strip() != "Sakit":  # sakit tidak pakai kuota
             kuota_index[nip] = kuota_index.get(nip, 0) + 1
 
     karyawan_kuota = {}

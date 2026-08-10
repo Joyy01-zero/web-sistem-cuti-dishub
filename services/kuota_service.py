@@ -12,6 +12,7 @@ def hitung_kuota_terpakai(nip: str, tahun: int) -> int:
         if str(row.get("NIP", "")).strip() == str(nip).strip()
         and str(row.get("TAHUN", "")) == str(tahun)
         and row.get("STATUS", "").strip() == "Disetujui"
+        and row.get("KEPERLUAN", "").strip() != "Sakit"  # sakit tidak pakai kuota
     )
     return terpakai
 

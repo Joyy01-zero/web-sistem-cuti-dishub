@@ -39,6 +39,7 @@ def form_cuti():
         if not nama: missing.append("Nama")
         if not jabatan: missing.append("Jabatan")
         if not seksi: missing.append("Bidang/Seksi")
+        if not shif: missing.append("Shif")
         if not tgl_mulai: missing.append("Tanggal Mulai")
         if not tgl_selesai: missing.append("Tanggal Selesai")
         if not keperluan: missing.append("Keperluan")
