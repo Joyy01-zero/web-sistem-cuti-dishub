@@ -27,11 +27,6 @@
                            placeholder="Nama lengkap" required class="input w-full text-sm">
                 </div>
                 <div>
-                    <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Lahir <span class="text-error">*</span></label>
-                    <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ form_data.get('tgl_lahir', '') }}" required
-                           class="input w-full text-sm">
-                </div>
-                <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Jabatan <span class="text-error">*</span></label>
                     <input type="text" id="jabatan" name="jabatan" value="{{ form_data.get('jabatan', '') }}"
                            placeholder="Jabatan" required class="input w-full text-sm">
@@ -82,6 +77,11 @@
                     <input type="text" id="kabid_kasi" name="kabid_kasi" value="{{ form_data.get('kabid_kasi', '') }}"
                            placeholder="Nama atasan" required class="input w-full text-sm">
                 </div>
+            </div>
+            <div class="mt-3">
+                <label class="block text-[13px] font-medium text-base-content mb-1">Catatan</label>
+                <textarea id="catatan" name="catatan" rows="2" placeholder="Opsional"
+                          class="textarea w-full text-sm resize-none">{{ form_data.get('catatan', '') }}</textarea>
             </div>
         </div>
 

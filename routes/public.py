@@ -24,7 +24,6 @@ def form_cuti():
 
         nip = request.form.get("nip", "").strip()
         nama = request.form.get("nama", "").strip()
-        tgl_lahir = request.form.get("tgl_lahir", "").strip()
         jabatan = request.form.get("jabatan", "").strip()
         seksi = request.form.get("seksi", "").strip()
         shif = request.form.get("shif", "").strip()
@@ -32,12 +31,20 @@ def form_cuti():
         tgl_selesai = request.form.get("tgl_selesai", "").strip()
         keperluan = request.form.get("keperluan", "").strip()
         kabid_kasi = request.form.get("kabid_kasi", "").strip()
+        catatan = request.form.get("catatan", "").strip()
 
         # Validasi field wajib
-        if not all(
-            [nip, nama, tgl_lahir, jabatan, seksi, tgl_mulai, tgl_selesai, keperluan, kabid_kasi]
-        ):
-            flash("Semua field wajib diisi.", "danger")
+        missing = []
+        if not nip: missing.append("NIP")
+        if not nama: missing.append("Nama")
+        if not jabatan: missing.append("Jabatan")
+        if not seksi: missing.append("Bidang/Seksi")
+        if not tgl_mulai: missing.append("Tanggal Mulai")
+        if not tgl_selesai: missing.append("Tanggal Selesai")
+        if not keperluan: missing.append("Keperluan")
+        if not kabid_kasi: missing.append("Kabid/Kasi")
+        if missing:
+            flash(f"Field wajib belum diisi: {', '.join(missing)}.", "danger")
             return render_template("form_cuti.html", form_data=request.form)
 
         # Validasi NIP format (hanya angka)
@@ -49,11 +56,6 @@ def form_cuti():
         karyawan = get_karyawan_by_nip(nip)
         if not karyawan:
             flash("NIP tidak terdaftar di database karyawan.", "danger")
-            return render_template("form_cuti.html", form_data=request.form)
-
-        # Validasi tgl lahir
-        if str(karyawan.get("TGL_LAHIR", "")).strip() != tgl_lahir:
-            flash("Tanggal lahir tidak sesuai data karyawan.", "danger")
             return render_template("form_cuti.html", form_data=request.form)
 
         # Validasi tanggal
@@ -106,6 +108,7 @@ def form_cuti():
             "TGL_SUBMIT": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "TAHUN": str(tahun),
             "ID": generate_pengajuan_id(),
+            "CATATAN": catatan,
         }
 
         try:

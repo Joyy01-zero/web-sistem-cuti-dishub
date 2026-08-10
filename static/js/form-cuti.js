@@ -34,11 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
             altInputClass: "input w-full text-sm"
         };
 
-        // Tanggal Lahir: maxDate hari ini (tidak bisa pilih masa depan)
-        flatpickr("#tgl_lahir", Object.assign({}, commonConfig, {
-            maxDate: "today"
-        }));
-
         // Tanggal Selesai: minDate hari ini (tidak bisa pilih masa lalu)
         const fpSelesai = flatpickr("#tgl_selesai", Object.assign({}, commonConfig, {
             minDate: "today"

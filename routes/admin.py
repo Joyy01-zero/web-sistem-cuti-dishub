@@ -147,7 +147,7 @@ def generate_surat_route(pengajuan_id):
 
     try:
         docx_bytes = generate_surat(data)
-        nama_file = data.get("NAMA", "unknown").replace(" ", "_")
+        nama_file = str(data.get("NAMA", "unknown")).replace(" ", "_")
         filename = f"Surat_Cuti_{nama_file}.docx"
         return send_file(
             io.BytesIO(docx_bytes),
@@ -156,6 +156,8 @@ def generate_surat_route(pengajuan_id):
             mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         flash(safe_error_message(e, "generate surat"), "danger")
         return redirect(url_for("admin.dashboard"))
 
@@ -268,7 +270,7 @@ def export_excel():
     headers = [
         "NO", "MASEHI", "HARI", "NAMA", "KEPERLUAN", "NO SURAT",
         "JABATAN", "SEKSI", "SHIF", "KABID/KASI", "NIP", "STATUS",
-        "TGL_SUBMIT", "TAHUN",
+        "TGL_SUBMIT", "TAHUN", "CATATAN",
     ]
     ws.append(headers)
 
@@ -288,6 +290,7 @@ def export_excel():
             row.get("STATUS", ""),
             row.get("TGL_SUBMIT", ""),
             row.get("TAHUN", ""),
+            row.get("CATATAN", ""),
         ])
 
     buffer = io.BytesIO()

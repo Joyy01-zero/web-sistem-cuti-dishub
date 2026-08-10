@@ -3,6 +3,7 @@ import os
 import logging
 
 from docx import Document
+from docx.shared import Pt
 
 from config.constants import BULAN_NAMA
 
@@ -92,8 +93,17 @@ def generate_surat(data: dict) -> bytes:
     all_replacements.update(no_surat_replacements)
     all_replacements.update(date_replacements)
 
-    # Replace in paragraphs
-    for paragraph in doc.paragraphs:
+    # Replace in paragraphs (skip last empty paragraph to avoid blank page)
+    all_paragraphs = doc.paragraphs
+    for i, paragraph in enumerate(all_paragraphs):
+        # Skip the final paragraph if empty (prevents extra blank page in Word)
+        if i == len(all_paragraphs) - 1 and not paragraph.text.strip():
+            # Set to minimal size so it doesn't force a new page
+            for run in paragraph.runs:
+                run.font.size = Pt(1)
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.paragraph_format.space_before = Pt(0)
+            continue
         _replace_in_paragraph(paragraph, all_replacements)
 
     # Replace in tables
@@ -102,6 +112,22 @@ def generate_surat(data: dict) -> bytes:
             for cell in row.cells:
                 for paragraph in cell.paragraphs:
                     _replace_in_paragraph(paragraph, all_replacements)
+
+    # Remove trailing empty paragraphs to prevent blank page
+    body = doc.element.body
+    trailing_empty = []
+    for child in reversed(list(body)):
+        if child.tag.endswith('}p'):  # paragraph element
+            # Collect all text from paragraph and its child runs
+            p_text = ''.join(child.itertext()).strip()
+            if not p_text:
+                trailing_empty.append(child)
+            else:
+                break
+        else:
+            break
+    for elem in trailing_empty:
+        body.remove(elem)
 
     buffer = io.BytesIO()
     doc.save(buffer)
