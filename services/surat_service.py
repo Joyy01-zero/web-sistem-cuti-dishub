@@ -1,9 +1,12 @@
 import io
 import os
+import logging
 
 from docx import Document
 
 from config.constants import BULAN_NAMA
+
+logger = logging.getLogger(__name__)
 
 TEMPLATE_PATH = os.path.join(
     os.path.dirname(os.path.dirname(__file__)),
@@ -11,25 +14,12 @@ TEMPLATE_PATH = os.path.join(
     "template_cuti_pkwt.docx",
 )
 
-# Mapping: teks asli di template → field dari data Sheets
-# Bagian 1: Surat Permohonan Cuti
-PERMOHONAN_REPLACEMENTS = {
-    "WAHYU EKO SAPUTRO": "NAMA",
-    "Tenaga Operasional Lalu Lintas": "JABATAN",
-    "Pengendalian dan Ketertiban": "SEKSI",
-    "28 s.d. 29 Juli 2026": "HARI",
-    "Normal": "SHIF",
-    "KEPERLUAN KELUARGA": "KEPERLUAN",
-    "FAIZAL RACHMAN, S.E": "KABID/KASI",
-}
 
-# Bagian 2: Surat Cuti Resmi
-RESMI_REPLACEMENTS = {
-    "167": "NO SURAT (nomor)",
-    "VI": "NO SURAT (bulan romawi)",
-}
-
-# Nama yang muncul di Bagian 2 (karyawan)
+def _safe_str(val):
+    """Convert any value to clean string."""
+    if val is None:
+        return ""
+    return str(val).strip()
 
 
 def generate_surat(data: dict) -> bytes:
@@ -37,47 +27,51 @@ def generate_surat(data: dict) -> bytes:
         raise FileNotFoundError(f"Template surat tidak ditemukan: {TEMPLATE_PATH}")
     doc = Document(TEMPLATE_PATH)
 
-    nama = data.get("NAMA", "")
-    jabatan = data.get("JABATAN", "")
-    seksi = data.get("SEKSI", "")
-    shif = data.get("SHIF", "")
-    hari = data.get("HARI", "")
-    keperluan = data.get("KEPERLUAN", "")
-    kabid = data.get("KABID/KASI", "")
-    no_surat = str(data.get("NO SURAT", "") or "").strip()
-    tgl_submit = str(data.get("TGL_SUBMIT", "") or "").strip()
+    # Cast semua field ke str — Sheets kadang return int
+    nama = _safe_str(data.get("NAMA", ""))
+    jabatan = _safe_str(data.get("JABATAN", ""))
+    seksi = _safe_str(data.get("SEKSI", ""))
+    shif = _safe_str(data.get("SHIF", ""))
+    hari = _safe_str(data.get("HARI", ""))
+    keperluan = _safe_str(data.get("KEPERLUAN", ""))
+    kabid = _safe_str(data.get("KABID/KASI", ""))
+    no_surat = _safe_str(data.get("NO SURAT", ""))
+    tgl_submit = _safe_str(data.get("TGL_SUBMIT", ""))
 
-    # Build full replacement map (teks asli → nilai baru)
+    logger.info(f"generate_surat: nama={nama}, no_surat={no_surat!r}")
+
+    # Build replacement map (teks asli di template → nilai baru)
     text_replacements = {
         "WAHYU EKO SAPUTRO": nama,
         "Tenaga Operasional Lalu Lintas": jabatan,
         "Pengendalian dan Ketertiban": seksi,
         "28 s.d. 29 Juli 2026": hari,
-        "KEPERLUAN KELUARGA": keperluan.upper(),
+        "KEPERLUAN KELUARGA": keperluan.upper() if keperluan else "",
         "FAIZAL RACHMAN, S.E": kabid,
     }
 
-    # Shif — only replace "Normal" if it appears in Shif context
-    # (avoid replacing "Normal" elsewhere in doc)
-    shif_replacements = {"Normal": shif}
+    # Shif
+    shif_replacements = {"Normal": shif} if shif else {}
 
-    # No surat — replace "167 /PKWT/VI/2026" pattern
-    # Parse no_surat like "167/PKWT/VI/2026"
-    if no_surat:
-        parts = no_surat.replace(" ", "").split("/")
+    # No surat — hanya replace jika format lengkap (167/PKWT/VI/2026)
+    no_surat_replacements = {}
+    if no_surat and "/" in no_surat:
+        parts = no_surat.split("/")
         if len(parts) >= 4:
-            nomor, _, bulan_romawi, tahun = parts[0], parts[1], parts[2], parts[3]
+            nomor = parts[0].strip()
+            bulan_romawi = parts[2].strip()
+            tahun = parts[3].strip()
             no_surat_replacements = {
                 "167": nomor,
                 "VI": bulan_romawi,
-                "2026": tahun,
             }
-        else:
-            no_surat_replacements = {"167 /PKWT/VI/2026": no_surat}
-    else:
-        no_surat_replacements = {}
+            # Hanya replace tahun surat, BUKAN semua "2026" di dokumen
+            # Cari pola "167 /PKWT/VI/2026" sebagai string utuh dulu
+            full_pattern = "167 /PKWT/VI/2026"
+            no_surat_replacements[full_pattern] = f"{nomor} /PKWT/{bulan_romawi}/{tahun}"
 
-    # Tanggal surat (bagian 2) — replace "Maret 2026"
+    # Tanggal surat (bagian 2)
+    tgl_str = ""
     if tgl_submit:
         try:
             from datetime import datetime
@@ -85,11 +79,7 @@ def generate_surat(data: dict) -> bytes:
             tgl_str = f"{BULAN_NAMA[dt.month]} {dt.year}"
         except Exception:
             tgl_str = tgl_submit
-    else:
-        tgl_str = ""
 
-    # Date replacements for Bogor, [bulan] [tahun]
-    # "Juli 2026" in bagian 1, "Maret 2026" in bagian 2
     date_replacements = {}
     if tgl_str:
         date_replacements["Juli 2026"] = tgl_str
@@ -129,6 +119,9 @@ def _replace_in_paragraph(paragraph, replacements):
         if old_text not in full_text:
             continue
 
+        # Pastikan new_text adalah string
+        new_text = str(new_text) if new_text is not None else ""
+
         # Try simple run-level replacement first
         replaced = False
         for run in paragraph.runs:
@@ -140,7 +133,7 @@ def _replace_in_paragraph(paragraph, replacements):
         if replaced:
             continue
 
-        # Target spans multiple runs — concatenate runs, find, replace, redistribute
+        # Target spans multiple runs — concatenate, replace, redistribute
         runs = paragraph.runs
         if not runs:
             continue
