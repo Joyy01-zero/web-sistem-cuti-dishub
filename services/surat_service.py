@@ -44,8 +44,8 @@ def generate_surat(data: dict) -> bytes:
     hari = data.get("HARI", "")
     keperluan = data.get("KEPERLUAN", "")
     kabid = data.get("KABID/KASI", "")
-    no_surat = data.get("NO SURAT", "")
-    tgl_submit = data.get("TGL_SUBMIT", "")
+    no_surat = str(data.get("NO SURAT", "") or "").strip()
+    tgl_submit = str(data.get("TGL_SUBMIT", "") or "").strip()
 
     # Build full replacement map (teks asli → nilai baru)
     text_replacements = {
