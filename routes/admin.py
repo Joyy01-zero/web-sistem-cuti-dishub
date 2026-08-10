@@ -145,6 +145,11 @@ def generate_surat_route(pengajuan_id):
         flash("Data tidak ditemukan.", "danger")
         return redirect(url_for("admin.dashboard"))
 
+    # Nomor surat dari form detail (diisi admin) — override data sheet
+    no_surat_input = request.args.get("no_surat", "").strip()
+    if no_surat_input:
+        data["NO SURAT"] = no_surat_input
+
     try:
         docx_bytes = generate_surat(data)
         nama_file = str(data.get("NAMA", "unknown")).replace(" ", "_")
