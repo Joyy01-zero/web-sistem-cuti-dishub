@@ -18,6 +18,7 @@ from config.settings import ADMIN_USERNAME, KUOTA_TAHUNAN, SHEET_CUTI
 from models import AdminUser
 from services.auth_service import check_lockout, clear_attempts, record_failed_attempt, verify_password
 from services.kuota_service import get_tahun_sekarang
+from services.kuota_service import KUOTA_HAMIL
 from services.security import get_real_ip, safe_error_message, validate_csrf
 from services.sheets_service import (
     get_all_records,
@@ -25,6 +26,7 @@ from services.sheets_service import (
     get_pengajuan_by_id,
     get_pengajuan_by_status,
     get_stats,
+    update_cell,
     update_status_by_id,
 )
 from services.surat_service import generate_surat
@@ -154,6 +156,23 @@ def generate_surat_route(pengajuan_id):
         docx_bytes = generate_surat(data)
         nama_file = str(data.get("NAMA", "unknown")).replace(" ", "_")
         filename = f"Surat_Cuti_{nama_file}.docx"
+
+        # Simpan no_surat ke Sheets agar tidak hilang (Fix 2)
+        if no_surat_input:
+            try:
+                from services.sheets_service import get_sheet
+                sheet = get_sheet(SHEET_CUTI)
+                headers = [h.strip() for h in sheet.row_values(1)]
+                id_col = headers.index("ID") + 1
+                id_values = sheet.col_values(id_col)
+                try:
+                    row_num = id_values.index(pengajuan_id) + 1
+                    update_cell(SHEET_CUTI, row_num, "NO SURAT", no_surat_input)
+                except ValueError:
+                    pass  # Row tidak ditemukan, skip
+            except Exception:
+                pass  # Non-critical, jangan gagalkan generate surat
+
         return send_file(
             io.BytesIO(docx_bytes),
             as_attachment=True,
@@ -221,28 +240,47 @@ def histori():
 
     tahun = int(tahun_filter) if tahun_filter else get_tahun_sekarang()
 
-    # Build a single index: count "Disetujui" per NIP for the target year
-    # This eliminates N+1 calls to hitung_kuota_terpakai()
-    kuota_index = {}  # nip -> count of Disetujui records
-    nama_index = {}   # nip -> nama (first occurrence)
+    # Build indexes: sum hari kerja per NIP for the target year
+    # Kuota tahunan (exclude Sakit & Cuti Hamil) + Kuota hamil terpisah
+    kuota_index = {}   # nip -> total hari kerja cuti tahunan
+    hamil_index = {}   # nip -> total hari kerja cuti hamil
+    nama_index = {}    # nip -> nama (first occurrence)
     for r in semua:
         nip = str(r.get("NIP", "")).strip()
         if not nip:
             continue
         if nip not in nama_index:
             nama_index[nip] = r.get("NAMA", "")
-        if str(r.get("TAHUN", "")) == str(tahun) and r.get("STATUS", "").strip() == "Disetujui" \
-                and r.get("KEPERLUAN", "").strip() != "Sakit":  # sakit tidak pakai kuota
-            kuota_index[nip] = kuota_index.get(nip, 0) + 1
+        if str(r.get("TAHUN", "")) != str(tahun):
+            continue
+        if r.get("STATUS", "").strip() != "Disetujui":
+            continue
+
+        keperluan = r.get("KEPERLUAN", "").strip()
+        durasi_raw = r.get("DURASI_HARI_KERJA", "")
+        try:
+            durasi = int(durasi_raw) if durasi_raw not in ("", None, 0, "0") else 1
+        except (ValueError, TypeError):
+            durasi = 1
+
+        if keperluan == "Cuti Hamil/Melahirkan":
+            hamil_index[nip] = hamil_index.get(nip, 0) + durasi
+        elif keperluan != "Sakit":
+            kuota_index[nip] = kuota_index.get(nip, 0) + durasi
 
     karyawan_kuota = {}
     for nip in nama_index:
         terpakai = kuota_index.get(nip, 0)
-        karyawan_kuota[nip] = {
+        hamil_terpakai = hamil_index.get(nip, 0)
+        entry = {
             "nama": nama_index[nip],
             "terpakai": terpakai,
-            "sisa": KUOTA_TAHUNAN - terpakai,
+            "sisa": max(KUOTA_TAHUNAN - terpakai, 0),
         }
+        if hamil_terpakai > 0:
+            entry["hamil_terpakai"] = hamil_terpakai
+            entry["hamil_sisa"] = max(KUOTA_HAMIL - hamil_terpakai, 0)
+        karyawan_kuota[nip] = entry
 
     return render_template(
         "histori.html",
@@ -276,7 +314,7 @@ def export_excel():
     headers = [
         "NO", "MASEHI", "HARI", "NAMA", "KEPERLUAN", "NO SURAT",
         "JABATAN", "SEKSI", "SHIF", "KABID/KASI", "NIP", "STATUS",
-        "TGL_SUBMIT", "TAHUN", "CATATAN",
+        "TGL_SUBMIT", "TAHUN", "DURASI_HARI_KERJA", "CATATAN",
     ]
     ws.append(headers)
 
@@ -296,6 +334,7 @@ def export_excel():
             row.get("STATUS", ""),
             row.get("TGL_SUBMIT", ""),
             row.get("TAHUN", ""),
+            row.get("DURASI_HARI_KERJA", ""),
             row.get("CATATAN", ""),
         ])
 

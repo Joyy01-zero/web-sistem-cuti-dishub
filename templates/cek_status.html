@@ -37,8 +37,13 @@
             <p class="text-xs text-base-content/50 font-mono">{{ nip }}</p>
         </div>
         <span class="inline-flex items-center justify-center sm:justify-start gap-1.5 text-[13px] font-medium text-primary bg-primary/10 px-3 py-1 rounded-full whitespace-nowrap">
-            Sisa kuota: {{ sisa_kuota }} / 12
+            Sisa kuota: {{ sisa_kuota }} / 12 hari kerja
         </span>
+        {% if sisa_kuota_hamil is defined and sisa_kuota_hamil < 90 %}
+        <span class="inline-flex items-center justify-center sm:justify-start gap-1.5 text-[13px] font-medium text-accent bg-accent/10 px-3 py-1 rounded-full whitespace-nowrap">
+            Cuti Hamil: {{ sisa_kuota_hamil }} / 90 hari kerja
+        </span>
+        {% endif %}
     </div>
 
     {% if pengajuan %}

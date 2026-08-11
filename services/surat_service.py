@@ -54,9 +54,9 @@ def generate_surat(data: dict) -> bytes:
     # Shif
     shif_replacements = {"Normal": shif} if shif else {}
 
-    # No surat — hanya replace jika format lengkap (167/PKWT/VI/2026)
+    # No surat — replace sesuai format
     no_surat_replacements = {}
-    if no_surat and "/" in no_surat:
+    if no_surat:
         parts = no_surat.split("/")
         if len(parts) >= 4:
             nomor = parts[0].strip()
@@ -70,6 +70,12 @@ def generate_surat(data: dict) -> bytes:
             # Cari pola "167 /PKWT/VI/2026" sebagai string utuh dulu
             full_pattern = "167 /PKWT/VI/2026"
             no_surat_replacements[full_pattern] = f"{nomor} /PKWT/{bulan_romawi}/{tahun}"
+        else:
+            # Format tidak lengkap (misal cuma "121212") — ganti seluruh pola nomor template
+            no_surat_replacements = {
+                "167 /PKWT/VI/2026": no_surat,
+                "167": no_surat,
+            }
 
     # Tanggal surat (bagian 2)
     tgl_str = ""

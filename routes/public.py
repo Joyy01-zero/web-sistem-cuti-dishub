@@ -4,7 +4,13 @@ from flask import Blueprint, flash, jsonify, redirect, render_template, request,
 
 from config.constants import BULAN_NAMA
 from config.settings import SHEET_CUTI
-from services.kuota_service import boleh_ajukan, get_tahun_sekarang, sisa_kuota
+from services.kuota_service import (
+    boleh_ajukan,
+    get_tahun_sekarang,
+    hitung_hari_kerja,
+    sisa_kuota,
+    sisa_kuota_hamil,
+)
 from services.security import rate_limit, safe_error_message, validate_csrf
 from services.sheets_service import (
     append_row,
@@ -70,10 +76,19 @@ def form_cuti():
             flash("Format tanggal tidak valid.", "danger")
             return render_template("form_cuti.html", form_data=request.form)
 
+        # Hitung durasi hari kerja
+        durasi_hari_kerja = hitung_hari_kerja(tgl_mulai, tgl_selesai)
+        if durasi_hari_kerja <= 0:
+            flash("Durasi cuti tidak valid (0 hari kerja).", "danger")
+            return render_template("form_cuti.html", form_data=request.form)
+
         # Validasi kuota
         tahun = get_tahun_sekarang()
-        if not boleh_ajukan(nip, tahun):
-            flash("Kuota cuti tahun ini sudah habis.", "danger")
+        if not boleh_ajukan(nip, tahun, keperluan, durasi_hari_kerja):
+            if keperluan == "Cuti Hamil/Melahirkan":
+                flash("Kuota cuti hamil/melahirkan (90 hari kerja) tidak mencukupi.", "danger")
+            else:
+                flash("Kuota cuti tahunan (12 hari kerja) tidak mencukupi.", "danger")
             return render_template("form_cuti.html", form_data=request.form)
 
         # Format hari
@@ -110,6 +125,7 @@ def form_cuti():
             "TAHUN": str(tahun),
             "ID": generate_pengajuan_id(),
             "CATATAN": catatan,
+            "DURASI_HARI_KERJA": str(durasi_hari_kerja),
         }
 
         try:
@@ -151,12 +167,14 @@ def cek_status():
             pengajuan = get_pengajuan_by_nip(nip)
             tahun = get_tahun_sekarang()
             sisa = sisa_kuota(nip, tahun)
+            sisa_hamil = sisa_kuota_hamil(nip, tahun)
             return render_template(
                 "cek_status.html",
                 pengajuan=pengajuan,
                 nama=karyawan.get("NAMA", ""),
                 nip=nip,
                 sisa_kuota=sisa,
+                sisa_kuota_hamil=sisa_hamil,
                 tahun=tahun,
                 submitted=True,
             )
@@ -187,6 +205,7 @@ def cek_status():
         pengajuan = get_pengajuan_by_nip(nip)
         tahun = get_tahun_sekarang()
         sisa = sisa_kuota(nip, tahun)
+        sisa_hamil = sisa_kuota_hamil(nip, tahun)
 
         return render_template(
             "cek_status.html",
@@ -194,6 +213,7 @@ def cek_status():
             nama=karyawan.get("NAMA", ""),
             nip=nip,
             sisa_kuota=sisa,
+            sisa_kuota_hamil=sisa_hamil,
             tahun=tahun,
             submitted=True,
         )

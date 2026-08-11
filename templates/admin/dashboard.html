@@ -34,7 +34,7 @@
         <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 items-end">
             <div>
                 <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Status</label>
-                <select name="status" class="select select-sm text-[13px] w-full" onchange="this.form.submit()">
+                <select name="status" class="select select-sm text-[13px] w-full">
                     <option value="Menunggu ACC">Menunggu ACC</option>
                     <option value="Disetujui" {{ 'selected' if status_filter == 'Disetujui' }}>Disetujui</option>
                     <option value="Ditolak" {{ 'selected' if status_filter == 'Ditolak' }}>Ditolak</option>
@@ -109,7 +109,7 @@
                         {% if p.get('ID') %}
                         <div class="flex gap-1">
                             <a href="{{ url_for('admin.detail', pengajuan_id=p.get('ID')) }}" class="btn btn-xs btn-ghost text-primary text-[12px]">Detail</a>
-                            <a href="{{ url_for('admin.generate_surat_route', pengajuan_id=p.get('ID')) }}" class="btn btn-xs btn-ghost text-base-content/50 text-[12px]">Surat</a>
+                            <a href="{{ url_for('admin.detail', pengajuan_id=p.get('ID')) }}" class="btn btn-xs btn-ghost text-base-content/50 text-[12px]">Surat</a>
                         </div>
                         {% endif %}
                     </td>
@@ -125,4 +125,14 @@
     </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script nonce="{{ csp_nonce() }}">
+// Auto-submit saat ganti filter Status
+document.addEventListener('DOMContentLoaded', function () {
+    var s = document.querySelector('select[name="status"]');
+    if (s) s.addEventListener('change', function () { this.form.submit(); });
+});
+</script>
 {% endblock %}

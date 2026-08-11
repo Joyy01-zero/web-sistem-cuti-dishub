@@ -59,7 +59,7 @@
 
     <!-- Kuota -->
     {% if karyawan_kuota %}
-    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Kuota Karyawan</h3>
+    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Kuota Karyawan (Hari Kerja)</h3>
     <div class="table-wrap mb-4">
         <table class="table table-zebra table-sm">
             <thead>
@@ -68,6 +68,7 @@
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Nama</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Pakai</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Sisa</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Cuti Hamil</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,14 +76,21 @@
                 <tr>
                     <td class="font-mono text-xs text-base-content/50">{{ nip }}</td>
                     <td class="font-medium text-[13px]">{{ info.nama }}</td>
-                    <td class="text-[13px]">{{ info.terpakai }}</td>
+                    <td class="text-[13px]">{{ info.terpakai }} hr</td>
                     <td>
                         {% set pct = ((12 - info.sisa) / 12 * 100)|int %}
                         {% set level = 'progress-error' if pct >= 75 else ('progress-warning' if pct >= 50 else 'progress-success') %}
                         <div class="flex items-center gap-2">
                             <progress class="progress {{ level }} w-16 h-1.5" value="{{ pct }}" max="100"></progress>
-                            <span class="text-xs text-base-content/50 whitespace-nowrap">{{ info.sisa }}/12</span>
+                            <span class="text-xs text-base-content/50 whitespace-nowrap">{{ info.sisa }}/12 hr</span>
                         </div>
+                    </td>
+                    <td class="text-[13px]">
+                        {% if info.hamil_terpakai is defined %}
+                        <span class="text-xs text-base-content/50">{{ info.hamil_terpakai }}/90 hr</span>
+                        {% else %}
+                        <span class="text-xs text-base-content/30">—</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
