@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block title %}Form Pengajuan Cuti{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/flatpickr/flatpickr.min.css') }}">
+{% endblock %}
+
 {% block content %}
 <div class="mb-4">
     <h1 class="font-display text-display text-base-content">Pengajuan Cuti</h1>
@@ -57,8 +61,15 @@
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Tanggal Selesai <span class="text-error">*</span></label>
-                    <input type="date" id="tgl_selesai" name="tgl_selesai" value="{{ form_data.get('tgl_selesai', '') }}" required
-                           class="input w-full text-sm">
+                    <div id="wrapper-flatpickr-selesai">
+                        <input type="date" id="tgl_selesai" name="tgl_selesai" value="{{ form_data.get('tgl_selesai', '') }}" required
+                               class="input w-full text-sm">
+                    </div>
+                    <div id="wrapper-readonly-selesai" style="display:none">
+                        <input type="text" id="tgl_selesai_readonly" disabled readonly
+                               class="input w-full text-sm opacity-50 cursor-not-allowed bg-base-200"
+                               placeholder="Otomatis (90 hari kerja)">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-[13px] font-medium text-base-content mb-1">Keperluan <span class="text-error">*</span></label>
@@ -98,5 +109,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/form-cuti.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/flatpickr/flatpickr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/flatpickr/id.js') }}"></script>
+<script src="{{ url_for('static', filename='js/form-cuti.js') }}?v=8"></script>
 {% endblock %}

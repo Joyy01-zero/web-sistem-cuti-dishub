@@ -9,7 +9,7 @@ import re
 from datetime import datetime, timedelta
 
 from config.settings import KUOTA_TAHUNAN, SHEET_CUTI
-from services.sheets_service import get_all_records
+from services.sheets_service import get_all_records, get_hari_libur_set
 
 KUOTA_HAMIL = 90  # hari kerja
 
@@ -33,13 +33,39 @@ def hitung_hari_kerja(tgl_mulai_str: str, tgl_selesai_str: str) -> int:
     if selesai < mulai:
         return 0
 
+    libur_set = get_hari_libur_set()
     count = 0
     current = mulai
     while current <= selesai:
-        if current.weekday() < 5:  # 0=Senin, 4=Jumat
+        if current.weekday() < 5 and current.strftime("%Y-%m-%d") not in libur_set:  # 0=Senin, 4=Jumat
             count += 1
         current += timedelta(days=1)
     return count
+
+
+def tambah_hari_kerja(tgl_mulai_str: str, hari_kerja_ditambahkan: int) -> str:
+    """Mengembalikan string YYYY-MM-DD setelah ditambahkan sejumlah hari kerja."""
+    try:
+        mulai = datetime.strptime(str(tgl_mulai_str).strip()[:10], "%Y-%m-%d").date()
+    except (ValueError, TypeError):
+        return ""
+
+    if hari_kerja_ditambahkan <= 0:
+        return ""
+
+    libur_set = get_hari_libur_set()
+    count = 1
+    current = mulai
+    
+    if current.weekday() >= 5 or current.strftime("%Y-%m-%d") in libur_set:
+        count = 0  # Kalau hari pertama libur, belum dihitung
+
+    while count < hari_kerja_ditambahkan:
+        current += timedelta(days=1)
+        if current.weekday() < 5 and current.strftime("%Y-%m-%d") not in libur_set:
+            count += 1
+            
+    return current.strftime("%Y-%m-%d")
 
 
 def parse_hari_str(hari_str: str) -> int:
@@ -57,10 +83,11 @@ def parse_hari_str(hari_str: str) -> int:
                 m_num = MONTHS_ID[m_str]
                 d1 = datetime(y_str, m_num, day1).date()
                 d2 = datetime(y_str, m_num, day2).date()
+                libur_set = get_hari_libur_set()
                 count = 0
                 cur = d1
                 while cur <= d2:
-                    if cur.weekday() < 5:
+                    if cur.weekday() < 5 and cur.strftime("%Y-%m-%d") not in libur_set:
                         count += 1
                     cur += timedelta(days=1)
                 return max(count, 1)
@@ -76,10 +103,11 @@ def parse_hari_str(hari_str: str) -> int:
             if m1_str in MONTHS_ID and m2_str in MONTHS_ID:
                 d1 = datetime(y1_str, MONTHS_ID[m1_str], day1).date()
                 d2 = datetime(y2_str, MONTHS_ID[m2_str], day2).date()
+                libur_set = get_hari_libur_set()
                 count = 0
                 cur = d1
                 while cur <= d2:
-                    if cur.weekday() < 5:
+                    if cur.weekday() < 5 and cur.strftime("%Y-%m-%d") not in libur_set:
                         count += 1
                     cur += timedelta(days=1)
                 return max(count, 1)
@@ -93,7 +121,9 @@ def parse_hari_str(hari_str: str) -> int:
             day1, m_str, y_str = int(m.group(1)), m.group(2).lower(), int(m.group(3))
             if m_str in MONTHS_ID:
                 d1 = datetime(y_str, MONTHS_ID[m_str], day1).date()
-                return 1 if d1.weekday() < 5 else 0
+                libur_set = get_hari_libur_set()
+                is_kerja = (d1.weekday() < 5) and (d1.strftime("%Y-%m-%d") not in libur_set)
+                return 1 if is_kerja else 0
         except Exception:
             pass
 

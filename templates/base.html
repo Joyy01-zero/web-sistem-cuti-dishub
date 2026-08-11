@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Geist+Mono:wght@400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
 </head>
 <body class="bg-base-100 min-h-screen flex flex-col overflow-x-clip">
 
@@ -52,6 +53,11 @@
                    class="px-3 py-1.5 rounded text-[13px] font-medium whitespace-nowrap transition-colors
                           {% if request.endpoint == 'admin.histori' %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:text-base-content hover:bg-base-200{% endif %}">
                     Histori
+                </a>
+                <a href="{{ url_for('admin.hari_libur') }}"
+                   class="px-3 py-1.5 rounded text-[13px] font-medium whitespace-nowrap transition-colors
+                          {% if request.endpoint and request.endpoint.startswith('admin.hari_libur') %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:text-base-content hover:bg-base-200{% endif %}">
+                    Hari Libur
                 </a>
                 <form action="{{ url_for('admin.logout') }}" method="POST" class="inline-form">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
@@ -121,6 +127,11 @@
                    class="block px-3 py-2.5 rounded text-[14px] font-medium transition-colors
                           {% if request.endpoint == 'admin.histori' %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:bg-base-200{% endif %}">
                     Histori
+                </a>
+                <a href="{{ url_for('admin.hari_libur') }}"
+                   class="block px-3 py-2.5 rounded text-[14px] font-medium transition-colors
+                          {% if request.endpoint and request.endpoint.startswith('admin.hari_libur') %}bg-primary/10 text-primary{% else %}text-base-content/70 hover:bg-base-200{% endif %}">
+                    Hari Libur
                 </a>
                 <form action="{{ url_for('admin.logout') }}" method="POST">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">

@@ -14,7 +14,7 @@ from flask import (
 )
 from flask_login import current_user, login_required, login_user, logout_user
 
-from config.settings import ADMIN_USERNAME, KUOTA_TAHUNAN, SHEET_CUTI
+from config.settings import ADMIN_USERNAME, KUOTA_TAHUNAN, SHEET_CUTI, SHEET_HARI_LIBUR
 from models import AdminUser
 from services.auth_service import check_lockout, clear_attempts, record_failed_attempt, verify_password
 from services.kuota_service import KUOTA_HAMIL, _get_durasi, get_tahun_sekarang
@@ -27,6 +27,10 @@ from services.sheets_service import (
     get_stats,
     update_cell,
     update_status_by_id,
+    get_all_hari_libur,
+    delete_hari_libur_by_tanggal,
+    invalidate_hari_libur_cache,
+    append_row,
 )
 from services.surat_service import generate_surat
 
@@ -344,3 +348,59 @@ def export_excel():
         download_name=filename,
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
+
+
+@admin_bp.route("/hari-libur")
+@login_required
+def hari_libur():
+    libur_list = get_all_hari_libur()
+    # Sort by TANGGAL descending
+    libur_list.sort(key=lambda x: str(x.get("TANGGAL", "")), reverse=True)
+    return render_template("hari_libur.html", libur_list=libur_list)
+
+
+@admin_bp.route("/hari-libur/add", methods=["POST"])
+@login_required
+def hari_libur_add():
+    validate_csrf()
+    tanggal = request.form.get("tanggal", "").strip()
+    keterangan = request.form.get("keterangan", "").strip()
+
+    if not tanggal or not keterangan:
+        flash("Tanggal dan keterangan harus diisi.", "danger")
+        return redirect(url_for("admin.hari_libur"))
+
+    # format YYYY-MM-DD check
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", tanggal):
+        flash("Format tanggal tidak valid.", "danger")
+        return redirect(url_for("admin.hari_libur"))
+        
+    tahun = tanggal[:4]
+    
+    data = {
+        "TANGGAL": tanggal,
+        "KETERANGAN": keterangan,
+        "TAHUN": tahun
+    }
+    
+    try:
+        append_row(SHEET_HARI_LIBUR, data)
+        invalidate_hari_libur_cache()  # penting karena libur set punya cache sendiri
+        flash("Hari libur berhasil ditambahkan.", "success")
+    except Exception as e:
+        flash(safe_error_message(e, "tambah hari libur"), "danger")
+
+    return redirect(url_for("admin.hari_libur"))
+
+
+@admin_bp.route("/hari-libur/delete/<string:tanggal>", methods=["POST"])
+@login_required
+def hari_libur_delete(tanggal):
+    validate_csrf()
+    try:
+        delete_hari_libur_by_tanggal(tanggal)
+        flash(f"Hari libur {tanggal} berhasil dihapus.", "success")
+    except Exception as e:
+        flash(safe_error_message(e, "hapus hari libur"), "danger")
+        
+    return redirect(url_for("admin.hari_libur"))

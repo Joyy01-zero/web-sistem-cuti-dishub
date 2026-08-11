@@ -10,6 +10,7 @@ from services.kuota_service import (
     hitung_hari_kerja,
     sisa_kuota,
     sisa_kuota_hamil,
+    tambah_hari_kerja,
 )
 from services.security import rate_limit, safe_error_message, validate_csrf
 from services.sheets_service import (
@@ -47,7 +48,8 @@ def form_cuti():
         if not seksi: missing.append("Bidang/Seksi")
         if not shif: missing.append("Shif")
         if not tgl_mulai: missing.append("Tanggal Mulai")
-        if not tgl_selesai: missing.append("Tanggal Selesai")
+        if not tgl_selesai and keperluan not in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"): 
+            missing.append("Tanggal Selesai")
         if not keperluan: missing.append("Keperluan")
         if not kabid_kasi: missing.append("Kabid/Kasi")
         if missing:
@@ -64,6 +66,10 @@ def form_cuti():
         if not karyawan:
             flash("NIP tidak terdaftar di database karyawan.", "danger")
             return render_template("form_cuti.html", form_data=request.form)
+
+        # Override tgl_selesai untuk Cuti Melahirkan (selalu hitung akurat dari server)
+        if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
+            tgl_selesai = tambah_hari_kerja(tgl_mulai, 90)
 
         # Validasi tanggal
         try:
@@ -152,6 +158,19 @@ def api_validate_nip(nip):
     if not karyawan:
         return jsonify({"valid": False, "message": "NIP tidak terdaftar."})
     return jsonify({"valid": True, "message": "NIP terdaftar."})
+
+
+@public_bp.route("/api/hitung-90-hari-kerja")
+@rate_limit(max_requests=30, window_seconds=60)
+def api_hitung_90_hari():
+    """API untuk menghitung tanggal selesai 90 hari kerja (cuti melahirkan)."""
+    mulai = request.args.get("mulai", "").strip()
+    if not mulai:
+        return jsonify({"selesai": "", "hari_kerja": 90})
+    
+    selesai = tambah_hari_kerja(mulai, 90)
+    return jsonify({"selesai": selesai, "hari_kerja": 90})
+
 
 
 

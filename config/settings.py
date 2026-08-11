@@ -34,3 +34,4 @@ MAX_SUBMIT_PER_HOUR = 10
 # Sheet names
 SHEET_CUTI = os.environ.get("SHEET_CUTI", "CUTI " + str(__import__("datetime").datetime.now().year))
 SHEET_KARYAWAN = "DATA_KARYAWAN"
+SHEET_HARI_LIBUR = "HARI_LIBUR"

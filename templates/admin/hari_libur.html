@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Kelola Hari Libur{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex items-center justify-between">
+    <div>
+        <h1 class="font-display text-display text-base-content">Hari Libur Nasional</h1>
+        <p class="text-base-content/50 text-[13px] mt-1">Kelola daftar hari libur yang tidak dihitung sebagai hari kerja</p>
+    </div>
+</div>
+
+<div class="neo-card p-4 sm:p-6 mb-6">
+    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Tambah Hari Libur</h3>
+    <form method="POST" action="{{ url_for('admin.hari_libur_add') }}" class="flex flex-col sm:flex-row gap-2 items-end">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+        
+        <div class="flex-1 w-full">
+            <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Tanggal</label>
+            <input type="date" name="tanggal" required class="input input-sm text-[13px] w-full">
+        </div>
+        
+        <div class="flex-1 w-full">
+            <label class="block text-[11px] font-semibold text-base-content/50 uppercase tracking-wide mb-1">Keterangan</label>
+            <input type="text" name="keterangan" required placeholder="Contoh: Tahun Baru Masehi" class="input input-sm text-[13px] w-full">
+        </div>
+
+        <button type="submit" class="btn btn-sm bg-primary hover:bg-primary-2 text-white border-none text-[13px] font-semibold w-full sm:w-auto">
+            Tambah
+        </button>
+    </form>
+</div>
+
+<div class="neo-card p-4 sm:p-6">
+    <h3 class="text-xs font-semibold text-base-content/50 uppercase tracking-wider mb-2.5">Daftar Hari Libur</h3>
+    {% if libur_list %}
+    <div class="table-wrap">
+        <table class="table table-zebra table-sm">
+            <thead class="thead-accent">
+                <tr>
+                    <th>No</th>
+                    <th>Tanggal</th>
+                    <th>Keterangan</th>
+                    <th>Tahun</th>
+                    <th class="text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for libur in libur_list %}
+                <tr>
+                    <td class="text-base-content/50 text-xs">{{ loop.index }}</td>
+                    <td class="font-mono text-[13px] font-medium">{{ libur.get('TANGGAL', '-') }}</td>
+                    <td class="text-[13px]">{{ libur.get('KETERANGAN', '-') }}</td>
+                    <td class="text-[13px] text-base-content/50">{{ libur.get('TAHUN', '-') }}</td>
+                    <td class="text-right">
+                        <form method="POST" action="{{ url_for('admin.hari_libur_delete', tanggal=libur.get('TANGGAL', '')) }}" class="inline-block" onsubmit="return confirm('Hapus hari libur ini?');">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-xs btn-ghost text-error hover:bg-error/10">
+                                Hapus
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🗓️</div>
+        <p class="empty-state-text">Belum ada data hari libur</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

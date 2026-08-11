@@ -70,6 +70,43 @@ def setup():
     except Exception:
         pass
 
+    # Sheet 3: HARI_LIBUR
+    libur_headers = ["TANGGAL", "KETERANGAN", "TAHUN"]
+    if "HARI_LIBUR" not in existing:
+        ws = spreadsheet.add_worksheet("HARI_LIBUR", rows=100, cols=3)
+        for col, header in enumerate(libur_headers, 1):
+            ws.update_cell(1, col, header)
+        
+        # Hardcoded data 2025 & 2026
+        hari_libur_data = [
+            ["2025-01-27", "Tahun Baru Imlek", "2025"],
+            ["2025-08-17", "Hari Kemerdekaan RI", "2025"],
+            ["2026-01-01", "Tahun Baru Masehi", "2026"],
+            ["2026-01-27", "Isra Miraj", "2026"],
+            ["2026-01-28", "Cuti Bersama Isra Miraj", "2026"],
+            ["2026-03-28", "Hari Raya Nyepi", "2026"],
+            ["2026-03-29", "Cuti Bersama Nyepi", "2026"],
+            ["2026-04-02", "Wafat Isa Almasih", "2026"],
+            ["2026-04-03", "Cuti Bersama Wafat Isa Almasih", "2026"],
+            ["2026-05-01", "Hari Buruh Internasional", "2026"],
+            ["2026-05-14", "Kenaikan Isa Almasih", "2026"],
+            ["2026-05-20", "Hari Kebangkitan Nasional", "2026"],
+            ["2026-05-25", "Hari Raya Waisak", "2026"],
+            ["2026-06-01", "Hari Lahir Pancasila", "2026"],
+            ["2026-06-18", "Idul Adha", "2026"],
+            ["2026-06-19", "Cuti Bersama Idul Adha", "2026"],
+            ["2026-07-08", "Tahun Baru Islam 1448 H", "2026"],
+            ["2026-08-17", "Hari Kemerdekaan RI", "2026"],
+            ["2026-09-16", "Maulid Nabi Muhammad SAW", "2026"],
+            ["2026-12-25", "Hari Raya Natal", "2026"],
+            ["2026-12-26", "Cuti Bersama Natal", "2026"],
+        ]
+        for row in hari_libur_data:
+            ws.append_row(row)
+        print("Created sheet: HARI_LIBUR (with default data)")
+    else:
+        print("Sheet 'HARI_LIBUR' already exists — skipping")
+
     print("\nSetup complete!")
     print(f"Spreadsheet URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}")
 
