@@ -17,8 +17,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from config.settings import ADMIN_USERNAME, KUOTA_TAHUNAN, SHEET_CUTI
 from models import AdminUser
 from services.auth_service import check_lockout, clear_attempts, record_failed_attempt, verify_password
-from services.kuota_service import get_tahun_sekarang
-from services.kuota_service import KUOTA_HAMIL
+from services.kuota_service import KUOTA_HAMIL, _get_durasi, get_tahun_sekarang
 from services.security import get_real_ip, safe_error_message, validate_csrf
 from services.sheets_service import (
     get_all_records,
@@ -257,11 +256,7 @@ def histori():
             continue
 
         keperluan = r.get("KEPERLUAN", "").strip()
-        durasi_raw = r.get("DURASI_HARI_KERJA", "")
-        try:
-            durasi = int(durasi_raw) if durasi_raw not in ("", None, 0, "0") else 1
-        except (ValueError, TypeError):
-            durasi = 1
+        durasi = _get_durasi(r)
 
         if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
             hamil_index[nip] = hamil_index.get(nip, 0) + durasi

@@ -157,7 +157,15 @@ def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=
 
 def append_row(sheet_name, data: dict, head_row=1):
     sheet = get_sheet(sheet_name)
-    headers = sheet.row_values(head_row)
+    headers = [h.strip() for h in sheet.row_values(head_row)]
+
+    # Auto-add missing column headers (e.g. DURASI_HARI_KERJA) to row 1
+    missing = [k for k in data.keys() if k not in headers]
+    if missing:
+        for m in missing:
+            headers.append(m)
+            sheet.update_cell(head_row, len(headers), m)
+
     row = [data.get(h, "") for h in headers]
     sheet.append_row(row)
     invalidate_cache(sheet_name)

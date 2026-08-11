@@ -5,12 +5,18 @@ Kuota dihitung dalam satuan **hari kerja** (Senin–Jumat).
 - Kuota cuti hamil/melahirkan: 90 hari kerja, terpisah dari kuota tahunan.
 """
 
+import re
 from datetime import datetime, timedelta
 
 from config.settings import KUOTA_TAHUNAN, SHEET_CUTI
 from services.sheets_service import get_all_records
 
 KUOTA_HAMIL = 90  # hari kerja
+
+MONTHS_ID = {
+    "januari": 1, "februari": 2, "maret": 3, "april": 4, "mei": 5, "juni": 6,
+    "juli": 7, "agustus": 8, "september": 9, "oktober": 10, "november": 11, "desember": 12,
+}
 
 
 def hitung_hari_kerja(tgl_mulai_str: str, tgl_selesai_str: str) -> int:
@@ -36,12 +42,71 @@ def hitung_hari_kerja(tgl_mulai_str: str, tgl_selesai_str: str) -> int:
     return count
 
 
+def parse_hari_str(hari_str: str) -> int:
+    """Parse string HARI (misal '11 s.d. 13 Agustus 2026') dan hitung hari kerjanya."""
+    s = str(hari_str).strip()
+    if not s:
+        return 1
+
+    # Pattern 1: '11 s.d. 13 Agustus 2026'
+    m = re.match(r"^(\d+)\s+s\.d\.\s+(\d+)\s+([A-Za-z]+)\s+(\d{4})$", s, re.IGNORECASE)
+    if m:
+        try:
+            day1, day2, m_str, y_str = int(m.group(1)), int(m.group(2)), m.group(3).lower(), int(m.group(4))
+            if m_str in MONTHS_ID:
+                m_num = MONTHS_ID[m_str]
+                d1 = datetime(y_str, m_num, day1).date()
+                d2 = datetime(y_str, m_num, day2).date()
+                count = 0
+                cur = d1
+                while cur <= d2:
+                    if cur.weekday() < 5:
+                        count += 1
+                    cur += timedelta(days=1)
+                return max(count, 1)
+        except Exception:
+            pass
+
+    # Pattern 2: '28 Juli 2026 s.d. 2 Agustus 2026'
+    m = re.match(r"^(\d+)\s+([A-Za-z]+)\s+(\d{4})\s+s\.d\.\s+(\d+)\s+([A-Za-z]+)\s+(\d{4})$", s, re.IGNORECASE)
+    if m:
+        try:
+            day1, m1_str, y1_str = int(m.group(1)), m.group(2).lower(), int(m.group(3))
+            day2, m2_str, y2_str = int(m.group(4)), m.group(5).lower(), int(m.group(6))
+            if m1_str in MONTHS_ID and m2_str in MONTHS_ID:
+                d1 = datetime(y1_str, MONTHS_ID[m1_str], day1).date()
+                d2 = datetime(y2_str, MONTHS_ID[m2_str], day2).date()
+                count = 0
+                cur = d1
+                while cur <= d2:
+                    if cur.weekday() < 5:
+                        count += 1
+                    cur += timedelta(days=1)
+                return max(count, 1)
+        except Exception:
+            pass
+
+    # Pattern 3: '11 Agustus 2026'
+    m = re.match(r"^(\d+)\s+([A-Za-z]+)\s+(\d{4})$", s, re.IGNORECASE)
+    if m:
+        try:
+            day1, m_str, y_str = int(m.group(1)), m.group(2).lower(), int(m.group(3))
+            if m_str in MONTHS_ID:
+                d1 = datetime(y_str, MONTHS_ID[m_str], day1).date()
+                return 1 if d1.weekday() < 5 else 0
+        except Exception:
+            pass
+
+    return 1
+
+
 def _get_durasi(row: dict) -> int:
     """Ambil durasi hari kerja dari row Sheets.
 
-    Prioritas: kolom DURASI_HARI_KERJA, fallback hitung dari HARI/tanggal.
+    Prioritas:
+    1. Kolom DURASI_HARI_KERJA
+    2. Parsing dari string HARI (misal '11 s.d. 13 Agustus 2026')
     """
-    # Coba ambil dari kolom DURASI_HARI_KERJA
     durasi_raw = row.get("DURASI_HARI_KERJA", "")
     if durasi_raw not in ("", None, 0, "0"):
         try:
@@ -49,8 +114,11 @@ def _get_durasi(row: dict) -> int:
         except (ValueError, TypeError):
             pass
 
-    # Fallback: hitung dari tanggal di kolom HARI (format "d Bulan YYYY" atau "d s.d. d Bulan YYYY")
-    # Tidak bisa diandalkan, return 1 sebagai fallback minimal
+    # Fallback: parse string HARI
+    hari_str = row.get("HARI", "")
+    if hari_str:
+        return parse_hari_str(hari_str)
+
     return 1
 
 
@@ -82,14 +150,7 @@ def sisa_kuota(nip: str, tahun: int) -> int:
 
 
 def boleh_ajukan(nip: str, tahun: int, keperluan: str = "", durasi: int = 1) -> bool:
-    """Cek apakah masih boleh mengajukan cuti.
-
-    Args:
-        nip: NIP karyawan
-        tahun: tahun pengajuan
-        keperluan: jenis keperluan cuti
-        durasi: durasi hari kerja yang diminta
-    """
+    """Cek apakah masih boleh mengajukan cuti."""
     if keperluan == "Sakit":
         return True  # sakit tidak pakai kuota
 
@@ -113,7 +174,7 @@ def hitung_kuota_hamil_terpakai(nip: str, tahun: int) -> int:
             continue
         if row.get("STATUS", "").strip() != "Disetujui":
             continue
-        if row.get("KEPERLUAN", "").strip() in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
+        if row.get("KEPERLUAN", "").strip() not in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
             continue
         total += _get_durasi(row)
     return total
