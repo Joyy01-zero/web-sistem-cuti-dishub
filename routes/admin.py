@@ -263,7 +263,7 @@ def histori():
         except (ValueError, TypeError):
             durasi = 1
 
-        if keperluan == "Cuti Hamil/Melahirkan":
+        if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
             hamil_index[nip] = hamil_index.get(nip, 0) + durasi
         elif keperluan != "Sakit":
             kuota_index[nip] = kuota_index.get(nip, 0) + durasi

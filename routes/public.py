@@ -85,7 +85,7 @@ def form_cuti():
         # Validasi kuota
         tahun = get_tahun_sekarang()
         if not boleh_ajukan(nip, tahun, keperluan, durasi_hari_kerja):
-            if keperluan == "Cuti Hamil/Melahirkan":
+            if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
                 flash("Kuota cuti hamil/melahirkan (90 hari kerja) tidak mencukupi.", "danger")
             else:
                 flash("Kuota cuti tahunan (12 hari kerja) tidak mencukupi.", "danger")

@@ -69,7 +69,7 @@ def hitung_kuota_terpakai(nip: str, tahun: int) -> int:
         if row.get("STATUS", "").strip() != "Disetujui":
             continue
         keperluan = row.get("KEPERLUAN", "").strip()
-        if keperluan in ("Sakit", "Cuti Hamil/Melahirkan"):
+        if keperluan in ("Sakit", "Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
             continue
         total += _get_durasi(row)
     return total
@@ -93,7 +93,7 @@ def boleh_ajukan(nip: str, tahun: int, keperluan: str = "", durasi: int = 1) -> 
     if keperluan == "Sakit":
         return True  # sakit tidak pakai kuota
 
-    if keperluan == "Cuti Hamil/Melahirkan":
+    if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
         sisa = sisa_kuota_hamil(nip, tahun)
         return sisa >= durasi
 
@@ -113,7 +113,7 @@ def hitung_kuota_hamil_terpakai(nip: str, tahun: int) -> int:
             continue
         if row.get("STATUS", "").strip() != "Disetujui":
             continue
-        if row.get("KEPERLUAN", "").strip() != "Cuti Hamil/Melahirkan":
+        if row.get("KEPERLUAN", "").strip() in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
             continue
         total += _get_durasi(row)
     return total
