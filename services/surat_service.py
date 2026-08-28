@@ -48,7 +48,9 @@ def generate_surat(data: dict) -> bytes:
         "Pengendalian dan Ketertiban": seksi,
         "28 s.d. 29 Juli 2026": hari,
         "KEPERLUAN KELUARGA": keperluan.upper() if keperluan else "",
+        "175": keperluan.upper() if keperluan else "",  # placeholder "Untuk keperluan : 175" di halaman 2
         "FAIZAL RACHMAN, S.E": kabid,
+        "NIP. 19830813 201001 1 001": "NIP. ....................",  # NIP Atasan Langsung dikosongkan
     }
 
     # Shif
