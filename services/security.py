@@ -125,18 +125,21 @@ def get_real_ip():
        trust X-Forwarded-For (explicit TRUSTED_PROXIES config).
     2. If REMOTE_ADDR is a private/internal address AND X-Forwarded-For is
        present, treat the connection as behind a PaaS ingress (Railway,
-       Heroku, Render) and trust XFF. Railway's edge overwrites XFF, so
-       this is safe — a public client connecting directly cannot spoof it.
+       Heroku, Render) and trust XFF.
     3. Otherwise fall back to REMOTE_ADDR (immune to XFF spoofing).
+
+    XFF parsing: take the LAST value (added by our trusted proxy), not the
+    first (which may be spoofed by the client). Proxies append, so the
+    rightmost entry is the one our proxy added.
     """
     remote = request.remote_addr or "unknown"
 
     if TRUSTED_PROXIES and remote in TRUSTED_PROXIES and request.headers.get("X-Forwarded-For"):
-        return request.headers["X-Forwarded-For"].split(",")[0].strip()
+        return request.headers["X-Forwarded-For"].split(",")[-1].strip()
 
     xff = request.headers.get("X-Forwarded-For")
     if xff and _is_private_ip(remote):
-        return xff.split(",")[0].strip()
+        return xff.split(",")[-1].strip()
 
     return remote
 
