@@ -319,6 +319,20 @@ def delete_hari_libur_by_tanggal(tanggal: str):
 
 # === Auth State (Lockout) via Google Sheets ===
 
+_AUTH_HEADERS = ["IP", "COUNT", "FIRST_ATTEMPT"]
+
+
+def _auth_sheet_indexes(sheet):
+    """Return (ip_col, count_col, ts_col) 1-based column indexes from headers."""
+    headers = [h.strip().upper() for h in sheet.row_values(1)]
+    # Normalize common typo FIRTS_ATTEMPT -> FIRST_ATTEMPT
+    headers = ["FIRST_ATTEMPT" if h == "FIRTS_ATTEMPT" else h for h in headers]
+    try:
+        return headers.index("IP") + 1, headers.index("COUNT") + 1, headers.index("FIRST_ATTEMPT") + 1
+    except ValueError:
+        raise ValueError("Kolom AUTH_STATE harus: IP, COUNT, FIRST_ATTEMPT")
+
+
 def get_auth_state(ip: str):
     """Get lockout state for an IP. Returns dict {count, first_attempt} or None."""
     try:
@@ -326,9 +340,16 @@ def get_auth_state(ip: str):
         records = sheet.get_all_records(head=1)
         for r in records:
             if str(r.get("IP", "")).strip() == ip.strip():
+                raw_ts = r.get("FIRST_ATTEMPT", r.get("FIRTS_ATTEMPT", 0))
+                try:
+                    first_attempt = float(raw_ts)
+                except (TypeError, ValueError):
+                    first_attempt = 0.0
+                if first_attempt <= 0:
+                    return None  # corrupt row — treat as no state
                 return {
                     "count": int(r.get("COUNT", 0)),
-                    "first_attempt": float(r.get("FIRST_ATTEMPT", 0)),
+                    "first_attempt": first_attempt,
                 }
         return None
     except (SheetNotFoundError, Exception):
@@ -339,17 +360,19 @@ def set_auth_state(ip: str, count: int, first_attempt: float):
     """Write or update lockout state for an IP."""
     try:
         sheet = get_sheet(SHEET_AUTH_STATE)
+        ip_col, count_col, ts_col = _auth_sheet_indexes(sheet)
         records = sheet.get_all_records(head=1)
 
         # Find existing row
         for i, r in enumerate(records, start=2):  # row 2 = first data row
             if str(r.get("IP", "")).strip() == ip.strip():
-                sheet.update_cell(i, 2, count)           # COUNT
-                sheet.update_cell(i, 3, first_attempt)    # FIRST_ATTEMPT
+                sheet.update_cell(i, count_col, count)
+                # Store as string to avoid Google Sheets float truncation
+                sheet.update_cell(i, ts_col, str(first_attempt))
                 return
 
         # Not found — append new row
-        sheet.append_row([ip, count, first_attempt])
+        sheet.append_row([ip, count, str(first_attempt)])
     except SheetNotFoundError:
         pass
 
@@ -358,6 +381,7 @@ def delete_auth_state(ip: str):
     """Remove lockout row for an IP."""
     try:
         sheet = get_sheet(SHEET_AUTH_STATE)
+        ip_col, count_col, ts_col = _auth_sheet_indexes(sheet)
         records = sheet.get_all_records(head=1)
         for i, r in enumerate(records, start=2):
             if str(r.get("IP", "")).strip() == ip.strip():
