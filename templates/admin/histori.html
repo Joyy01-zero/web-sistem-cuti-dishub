@@ -64,7 +64,7 @@
         <table class="table table-zebra table-sm">
             <thead>
                 <tr class="bg-base-200">
-                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">NIP</th>
+                    <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">NI PPPK PW</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Nama</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Pakai</th>
                     <th class="text-[11px] text-base-content/50 font-semibold uppercase tracking-wide">Sisa</th>
@@ -74,6 +74,7 @@
             <tbody>
                 {% for nama, info in karyawan_kuota.items() %}
                 <tr>
+                    <td class="font-mono text-[12px]">{{ info.nip }}</td>
                     <td class="font-medium text-[13px]">{{ info.nama }}</td>
                     <td class="text-[13px]">{{ info.terpakai }} hr</td>
                     <td>

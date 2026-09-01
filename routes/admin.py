@@ -247,6 +247,7 @@ def histori():
     # Kuota tahunan (exclude Sakit & Cuti Hamil) + Kuota hamil terpisah
     kuota_index = {}   # nama -> total hari kerja cuti tahunan
     hamil_index = {}   # nama -> total hari kerja cuti hamil
+    nip_index = {}     # nama -> NI PPPK PW
     for r in semua:
         nama = str(r.get("NAMA", "")).strip()
         if not nama:
@@ -264,11 +265,18 @@ def histori():
         elif keperluan != "Sakit":
             kuota_index[nama] = kuota_index.get(nama, 0) + durasi
 
+        # Track NI PPPK PW per nama (first seen wins)
+        nip_val = str(r.get("NIP", "")).strip()
+        if nip_val and nama not in nip_index:
+            nip_index[nama] = nip_val
+
     karyawan_kuota = {}
     for nama in set(list(kuota_index.keys()) + list(hamil_index.keys())):
         terpakai = kuota_index.get(nama, 0)
         hamil_terpakai = hamil_index.get(nama, 0)
+        nip = nip_index.get(nama, "-")
         entry = {
+            "nip": nip,
             "nama": nama,
             "terpakai": terpakai,
             "sisa": max(KUOTA_TAHUNAN - terpakai, 0),
