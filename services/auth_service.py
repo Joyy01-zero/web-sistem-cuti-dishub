@@ -16,13 +16,14 @@ def hash_password(password: str) -> str:
 
 
 # ============================================================
-# Lockout state — Google Sheets based, persistent across restarts.
+# Lockout state — per-USERNAME, Google Sheets backed.
+# Persists across Railway restarts. Immune to CGNAT IP rotation.
 # ============================================================
 
 
-def check_lockout(ip: str) -> tuple[bool, int]:
-    """Check if IP is locked out. Returns (is_locked, seconds_remaining)."""
-    attempt = get_auth_state(ip)
+def check_lockout(username: str) -> tuple[bool, int]:
+    """Check if username is locked out. Returns (is_locked, seconds_remaining)."""
+    attempt = get_auth_state(username)
     if not attempt:
         return False, 0
 
@@ -31,7 +32,7 @@ def check_lockout(ip: str) -> tuple[bool, int]:
 
     # Expired — clean up
     if elapsed >= lockout_seconds:
-        delete_auth_state(ip)
+        delete_auth_state(username)
         return False, 0
 
     if attempt["count"] >= MAX_LOGIN_ATTEMPTS:
@@ -41,18 +42,18 @@ def check_lockout(ip: str) -> tuple[bool, int]:
     return False, 0
 
 
-def record_failed_attempt(ip: str):
-    attempt = get_auth_state(ip)
+def record_failed_attempt(username: str):
+    attempt = get_auth_state(username)
     if not attempt:
-        set_auth_state(ip, 1, time.time())
+        set_auth_state(username, 1, time.time())
     else:
         # Purge if expired
         elapsed = time.time() - attempt["first_attempt"]
         if elapsed >= LOGIN_LOCKOUT_MINUTES * 60:
-            set_auth_state(ip, 1, time.time())
+            set_auth_state(username, 1, time.time())
         else:
-            set_auth_state(ip, attempt["count"] + 1, attempt["first_attempt"])
+            set_auth_state(username, attempt["count"] + 1, attempt["first_attempt"])
 
 
-def clear_attempts(ip: str):
-    delete_auth_state(ip)
+def clear_attempts(username: str):
+    delete_auth_state(username)

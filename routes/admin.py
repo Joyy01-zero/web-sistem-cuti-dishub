@@ -52,30 +52,30 @@ def login():
     if request.method == "POST":
         validate_csrf()  # CSRF check
 
-        ip = get_real_ip()  # Real IP behind proxy
-        is_locked, remaining = check_lockout(ip)
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "")
+
+        # Check lockout per USERNAME (immune to CGNAT IP rotation)
+        is_locked, remaining = check_lockout(username)
 
         if is_locked:
             flash(f"Akun terkunci. Coba lagi dalam {remaining} detik.", "danger")
             return render_template("login.html")
-
-        username = request.form.get("username", "").strip()
-        password = request.form.get("password", "")
 
         # Always verify password even if username wrong (timing attack prevention)
         password_ok = verify_password(password)
         username_ok = (username == ADMIN_USERNAME)
 
         if username_ok and password_ok:
-            clear_attempts(ip)
+            clear_attempts(username)
             user = AdminUser(username)
             login_user(user, remember=False)
             session.permanent = True
             flash("Login berhasil.", "success")
             return redirect(url_for("admin.dashboard"))
         else:
-            record_failed_attempt(ip)
-            is_locked, remaining = check_lockout(ip)
+            record_failed_attempt(username)
+            is_locked, remaining = check_lockout(username)
             if is_locked:
                 flash(
                     f"Password salah. Akun terkunci selama {remaining} detik.",
