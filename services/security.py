@@ -118,12 +118,37 @@ def rate_limit(max_requests, window_seconds, key_func=None, methods=None):
 # ============================================================
 
 def get_real_ip():
-    """Get real client IP. Only trust X-Forwarded-For from known proxies."""
+    """Get real client IP.
+
+    Strategy:
+    1. If the direct peer (REMOTE_ADDR) is a configured trusted proxy,
+       trust X-Forwarded-For (explicit TRUSTED_PROXIES config).
+    2. If REMOTE_ADDR is a private/internal address AND X-Forwarded-For is
+       present, treat the connection as behind a PaaS ingress (Railway,
+       Heroku, Render) and trust XFF. Railway's edge overwrites XFF, so
+       this is safe — a public client connecting directly cannot spoof it.
+    3. Otherwise fall back to REMOTE_ADDR (immune to XFF spoofing).
+    """
     remote = request.remote_addr or "unknown"
+
     if TRUSTED_PROXIES and remote in TRUSTED_PROXIES and request.headers.get("X-Forwarded-For"):
-        # Only trust X-Forwarded-For if request comes from a known proxy
         return request.headers["X-Forwarded-For"].split(",")[0].strip()
-    return request.remote_addr or "unknown"
+
+    xff = request.headers.get("X-Forwarded-For")
+    if xff and _is_private_ip(remote):
+        return xff.split(",")[0].strip()
+
+    return remote
+
+
+def _is_private_ip(ip: str) -> bool:
+    """True if ip is a private/internal (RFC1918) or loopback address."""
+    try:
+        import ipaddress
+        addr = ipaddress.ip_address(ip)
+        return addr.is_private or addr.is_loopback
+    except ValueError:
+        return False
 
 
 # ============================================================
