@@ -7,7 +7,7 @@ from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
-from config.settings import SHEET_CUTI, SHEET_HARI_LIBUR, SHEET_KARYAWAN
+from config.settings import SHEET_AUTH_STATE, SHEET_CUTI, SHEET_HARI_LIBUR, SHEET_KARYAWAN, SHEET_KABID_KASI
 
 
 class SheetNotFoundError(Exception):
@@ -120,6 +120,23 @@ def get_all_records(sheet_name):
     return _get_cached_data(sheet_name)
 
 
+def get_all_kabid_kasi():
+    """Mengambil daftar nama dan NIP KABID/KASI."""
+    try:
+        return get_all_records(SHEET_KABID_KASI)
+    except SheetNotFoundError:
+        return []
+
+
+def get_kabid_kasi_by_nama(nama):
+    """Mencari NIP KABID/KASI berdasarkan nama."""
+    target = str(nama).strip().casefold()
+    for row in get_all_kabid_kasi():
+        if str(row.get("NAMA", "")).strip().casefold() == target:
+            return dict(row)
+    return None
+
+
 def get_karyawan_by_nip(nip):
     records = get_all_records(SHEET_KARYAWAN)
     for r in records:
@@ -134,9 +151,9 @@ def get_karyawan_by_nip(nip):
     return None
 
 
-def get_pengajuan_by_nip(nip):
+def get_pengajuan_by_nama(nama):
     records = get_all_records(SHEET_CUTI)
-    return [r for r in records if str(r.get("NIP", "")).strip() == str(nip).strip()]
+    return [r for r in records if str(r.get("NAMA", "")).strip().casefold() == str(nama).strip().casefold()]
 
 
 def get_pengajuan_by_status(status_filter=None, bulan_filter=None, seksi_filter=None):
@@ -298,3 +315,53 @@ def delete_hari_libur_by_tanggal(tanggal: str):
         invalidate_hari_libur_cache()
     else:
         raise ValueError(f"Tanggal '{tanggal}' tidak ditemukan.")
+
+
+# === Auth State (Lockout) via Google Sheets ===
+
+def get_auth_state(ip: str):
+    """Get lockout state for an IP. Returns dict {count, first_attempt} or None."""
+    try:
+        sheet = get_sheet(SHEET_AUTH_STATE)
+        records = sheet.get_all_records(head=1)
+        for r in records:
+            if str(r.get("IP", "")).strip() == ip.strip():
+                return {
+                    "count": int(r.get("COUNT", 0)),
+                    "first_attempt": float(r.get("FIRST_ATTEMPT", 0)),
+                }
+        return None
+    except (SheetNotFoundError, Exception):
+        return None
+
+
+def set_auth_state(ip: str, count: int, first_attempt: float):
+    """Write or update lockout state for an IP."""
+    try:
+        sheet = get_sheet(SHEET_AUTH_STATE)
+        records = sheet.get_all_records(head=1)
+
+        # Find existing row
+        for i, r in enumerate(records, start=2):  # row 2 = first data row
+            if str(r.get("IP", "")).strip() == ip.strip():
+                sheet.update_cell(i, 2, count)           # COUNT
+                sheet.update_cell(i, 3, first_attempt)    # FIRST_ATTEMPT
+                return
+
+        # Not found — append new row
+        sheet.append_row([ip, count, first_attempt])
+    except SheetNotFoundError:
+        pass
+
+
+def delete_auth_state(ip: str):
+    """Remove lockout row for an IP."""
+    try:
+        sheet = get_sheet(SHEET_AUTH_STATE)
+        records = sheet.get_all_records(head=1)
+        for i, r in enumerate(records, start=2):
+            if str(r.get("IP", "")).strip() == ip.strip():
+                sheet.delete_rows(i)
+                return
+    except (SheetNotFoundError, Exception):
+        pass

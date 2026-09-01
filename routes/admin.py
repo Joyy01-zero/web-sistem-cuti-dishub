@@ -243,17 +243,14 @@ def histori():
 
     tahun = int(tahun_filter) if tahun_filter else get_tahun_sekarang()
 
-    # Build indexes: sum hari kerja per NIP for the target year
+    # Build indexes: sum hari kerja per NAMA for the target year
     # Kuota tahunan (exclude Sakit & Cuti Hamil) + Kuota hamil terpisah
-    kuota_index = {}   # nip -> total hari kerja cuti tahunan
-    hamil_index = {}   # nip -> total hari kerja cuti hamil
-    nama_index = {}    # nip -> nama (first occurrence)
+    kuota_index = {}   # nama -> total hari kerja cuti tahunan
+    hamil_index = {}   # nama -> total hari kerja cuti hamil
     for r in semua:
-        nip = str(r.get("NIP", "")).strip()
-        if not nip:
+        nama = str(r.get("NAMA", "")).strip()
+        if not nama:
             continue
-        if nip not in nama_index:
-            nama_index[nip] = r.get("NAMA", "")
         if str(r.get("TAHUN", "")) != str(tahun):
             continue
         if r.get("STATUS", "").strip() != "Disetujui":
@@ -263,23 +260,23 @@ def histori():
         durasi = _get_durasi(r)
 
         if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
-            hamil_index[nip] = hamil_index.get(nip, 0) + durasi
+            hamil_index[nama] = hamil_index.get(nama, 0) + durasi
         elif keperluan != "Sakit":
-            kuota_index[nip] = kuota_index.get(nip, 0) + durasi
+            kuota_index[nama] = kuota_index.get(nama, 0) + durasi
 
     karyawan_kuota = {}
-    for nip in nama_index:
-        terpakai = kuota_index.get(nip, 0)
-        hamil_terpakai = hamil_index.get(nip, 0)
+    for nama in set(list(kuota_index.keys()) + list(hamil_index.keys())):
+        terpakai = kuota_index.get(nama, 0)
+        hamil_terpakai = hamil_index.get(nama, 0)
         entry = {
-            "nama": nama_index[nip],
+            "nama": nama,
             "terpakai": terpakai,
             "sisa": max(KUOTA_TAHUNAN - terpakai, 0),
         }
         if hamil_terpakai > 0:
             entry["hamil_terpakai"] = hamil_terpakai
             entry["hamil_sisa"] = max(KUOTA_HAMIL - hamil_terpakai, 0)
-        karyawan_kuota[nip] = entry
+        karyawan_kuota[nama] = entry
 
     return render_template(
         "histori.html",

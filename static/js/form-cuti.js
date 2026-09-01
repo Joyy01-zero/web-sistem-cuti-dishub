@@ -1,20 +1,20 @@
-// ===== NIP validation =====
-document.getElementById('nip').addEventListener('blur', async function() {
-    const nip = this.value.trim();
-    const status = document.getElementById('nip-status');
-    if (!nip) { status.textContent = ''; return; }
+// ===== NI PPPK PW validation =====
+document.getElementById('ni_pppk_pw').addEventListener('blur', async function() {
+    const niPppkPw = this.value.trim();
+    const status = document.getElementById('ni-pppk-pw-status');
+    if (!niPppkPw) { status.textContent = ''; return; }
     status.textContent = 'Mencari...';
     status.className = 'text-xs mt-0.5 block text-base-content/50';
     try {
-        const resp = await fetch(`/api/karyawan/validate/${nip}`);
+        const resp = await fetch(`/api/karyawan/validate/${niPppkPw}`);
         const data = await resp.json();
         const span = document.createElement('span');
         if (data.valid) {
             span.className = 'text-success font-medium';
-            span.textContent = '✓ NIP terdaftar';
+            span.textContent = '✓ NI PPPK PW terdaftar';
         } else {
             span.className = 'text-error font-medium';
-            span.textContent = '✗ NIP tidak terdaftar';
+            span.textContent = '✗ NI PPPK PW tidak terdaftar';
         }
         status.replaceChildren(span);
     } catch(e) { status.textContent = ''; }

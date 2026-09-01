@@ -152,15 +152,15 @@ def _get_durasi(row: dict) -> int:
     return 1
 
 
-def hitung_kuota_terpakai(nip: str, tahun: int) -> int:
-    """Hitung total hari kerja cuti tahunan terpakai untuk NIP di tahun tertentu.
+def hitung_kuota_terpakai(nama: str, tahun: int) -> int:
+    """Hitung total hari kerja cuti tahunan terpakai untuk NAMA di tahun tertentu.
 
     Exclude: Sakit, Cuti Hamil/Melahirkan (punya kuota terpisah).
     """
     semua_data = get_all_records(SHEET_CUTI)
     total = 0
     for row in semua_data:
-        if str(row.get("NIP", "")).strip() != str(nip).strip():
+        if str(row.get("NAMA", "")).strip().casefold() != str(nama).strip().casefold():
             continue
         if str(row.get("TAHUN", "")) != str(tahun):
             continue
@@ -173,32 +173,32 @@ def hitung_kuota_terpakai(nip: str, tahun: int) -> int:
     return total
 
 
-def sisa_kuota(nip: str, tahun: int) -> int:
+def sisa_kuota(nama: str, tahun: int) -> int:
     """Sisa kuota cuti tahunan dalam hari kerja."""
-    sisa = KUOTA_TAHUNAN - hitung_kuota_terpakai(nip, tahun)
+    sisa = KUOTA_TAHUNAN - hitung_kuota_terpakai(nama, tahun)
     return max(sisa, 0)
 
 
-def boleh_ajukan(nip: str, tahun: int, keperluan: str = "", durasi: int = 1) -> bool:
+def boleh_ajukan(nama: str, tahun: int, keperluan: str = "", durasi: int = 1) -> bool:
     """Cek apakah masih boleh mengajukan cuti."""
     if keperluan == "Sakit":
         return True  # sakit tidak pakai kuota
 
     if keperluan in ("Cuti Hamil/Melahirkan", "Cuti Melahirkan"):
-        sisa = sisa_kuota_hamil(nip, tahun)
+        sisa = sisa_kuota_hamil(nama, tahun)
         return sisa >= durasi
 
-    return sisa_kuota(nip, tahun) >= durasi
+    return sisa_kuota(nama, tahun) >= durasi
 
 
 # ── Kuota Cuti Hamil ──────────────────────────────────────────────────
 
-def hitung_kuota_hamil_terpakai(nip: str, tahun: int) -> int:
+def hitung_kuota_hamil_terpakai(nama: str, tahun: int) -> int:
     """Hitung total hari kerja cuti hamil/melahirkan terpakai."""
     semua_data = get_all_records(SHEET_CUTI)
     total = 0
     for row in semua_data:
-        if str(row.get("NIP", "")).strip() != str(nip).strip():
+        if str(row.get("NAMA", "")).strip().casefold() != str(nama).strip().casefold():
             continue
         if str(row.get("TAHUN", "")) != str(tahun):
             continue
@@ -210,9 +210,9 @@ def hitung_kuota_hamil_terpakai(nip: str, tahun: int) -> int:
     return total
 
 
-def sisa_kuota_hamil(nip: str, tahun: int) -> int:
+def sisa_kuota_hamil(nama: str, tahun: int) -> int:
     """Sisa kuota cuti hamil dalam hari kerja."""
-    sisa = KUOTA_HAMIL - hitung_kuota_hamil_terpakai(nip, tahun)
+    sisa = KUOTA_HAMIL - hitung_kuota_hamil_terpakai(nama, tahun)
     return max(sisa, 0)
 
 

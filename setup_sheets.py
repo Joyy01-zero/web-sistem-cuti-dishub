@@ -108,6 +108,18 @@ def setup():
         print("Sheet 'HARI_LIBUR' already exists — skipping")
 
     print("\nSetup complete!")
+
+    # Sheet 4: AUTH_STATE (login lockout)
+    auth_headers = ["IP", "COUNT", "FIRST_ATTEMPT"]
+    if "AUTH_STATE" not in existing:
+        ws = spreadsheet.add_worksheet("AUTH_STATE", rows=100, cols=3)
+        for col, header in enumerate(auth_headers, 1):
+            ws.update_cell(1, col, header)
+        print("Created sheet: AUTH_STATE")
+    else:
+        print("Sheet 'AUTH_STATE' already exists — skipping")
+
+    print(f"\nSetup complete!")
     print(f"Spreadsheet URL: https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}")
 
 

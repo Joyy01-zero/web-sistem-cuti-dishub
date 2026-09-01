@@ -72,9 +72,8 @@
                 </tr>
             </thead>
             <tbody>
-                {% for nip, info in karyawan_kuota.items() %}
+                {% for nama, info in karyawan_kuota.items() %}
                 <tr>
-                    <td class="font-mono text-xs text-base-content/50">{{ nip }}</td>
                     <td class="font-medium text-[13px]">{{ info.nama }}</td>
                     <td class="text-[13px]">{{ info.terpakai }} hr</td>
                     <td>
